@@ -705,7 +705,7 @@
             alert(`${title}: ${message}`);
         }
 
-    // Fixed JavaScript dengan debugging yang lebih komprehensif
+   // Fixed JavaScript dengan debugging yang lebih komprehensif
 document.getElementById('pushForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -787,9 +787,47 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
 
         let result;
         const contentType = res.headers.get('content-type');
+        const contentLength = res.headers.get('content-length');
         
-        if (contentType && contentType.includes('application/json')) {
-            result = await res.json();
+        console.log('Response content-length:', contentLength);
+        console.log('Response content-type:', contentType);
+        
+        // PERBAIKAN: Handle empty response (content-length: 0)
+        if (contentLength === '0' || contentLength === 0) {
+            console.log('Empty response detected - workflow likely succeeded');
+            
+            // Empty response dari N8N biasanya berarti workflow berhasil
+            result = {
+                success: true,
+                error: false,
+                message: 'Push completed successfully! (Empty response from server indicates success)'
+            };
+        } else if (contentType && contentType.includes('application/json')) {
+            try {
+                const responseText = await res.text();
+                console.log('Raw response text:', responseText);
+                
+                if (responseText.trim() === '') {
+                    console.log('Empty JSON response - treating as success');
+                    result = {
+                        success: true,
+                        error: false,
+                        message: 'Push completed successfully! (Empty JSON response)'
+                    };
+                } else {
+                    result = JSON.parse(responseText);
+                }
+            } catch (parseError) {
+                console.log('JSON parse error:', parseError);
+                console.log('Response might be malformed JSON');
+                
+                result = {
+                    success: false,
+                    error: true,
+                    message: 'Server returned invalid JSON response. The workflow may have started but response was malformed.',
+                    code: 'PARSE_ERROR'
+                };
+            }
         } else {
             const textResult = await res.text();
             console.log('Non-JSON response:', textResult);
@@ -804,22 +842,28 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
                 };
             } else if (textResult.includes('Workflow was started')) {
                 result = {
-                    success: false,
-                    error: true,
-                    message: 'Workflow started but returned unexpected response: ' + textResult
+                    success: true,
+                    error: false,
+                    message: 'Workflow started successfully: ' + textResult
+                };
+            } else if (textResult.trim() === '') {
+                result = {
+                    success: true,
+                    error: false,
+                    message: 'Push completed successfully! (Empty response from server)'
                 };
             } else {
                 result = {
                     success: false,
                     error: true,
-                    message: 'Server returned invalid response: ' + textResult
+                    message: 'Server returned unexpected response: ' + textResult
                 };
             }
         }
 
         console.log('SERVER RESPONSE:', JSON.stringify(result, null, 2));
 
-        // Handle response
+        // Handle response dengan logging yang lebih baik
         if (result.success === true && result.error !== true) {
             showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
             form.reset();
@@ -902,6 +946,7 @@ function updateDebugInfo() {
         console.error('Error in updateDebugInfo:', error);
     }
 }
+
 
         // Close modal when clicking outside
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
