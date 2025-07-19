@@ -425,7 +425,119 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
+        }@keyframes alertSlideIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.7) translateY(-50px) rotateX(20deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05) translateY(-10px) rotateX(-5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotateX(0deg);
+    }
+}
+
+@keyframes alertSlideOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-30px);
+    }
+}
+
+.alert-modal {
+    /* Update animasi yang ada */
+    animation: alertSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.alert-overlay.hide .alert-modal {
+    animation: alertSlideOut 0.3s ease-in-out;
+}
+
+/* Icon pulse animation */
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.alert-icon {
+    animation: bounceIn 0.6s ease-out 0.2s both, iconPulse 2s infinite 1s;
+}
+
+/* Success sparkle effect */
+.alert-icon.success::after {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 20px;
+    animation: sparkle 1.5s infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: rotate(0deg) scale(0.5); }
+    50% { opacity: 1; transform: rotate(180deg) scale(1.2); }
+}
+
+/* Error shake effect */
+.alert-icon.error {
+    animation: bounceIn 0.6s ease-out 0.2s both, shake 0.5s ease-in-out 0.8s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Warning glow effect */
+.alert-icon.warning {
+    animation: bounceIn 0.6s ease-out 0.2s both, glow 2s infinite 1s;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4); }
+    50% { box-shadow: 0 8px 35px rgba(237, 137, 54, 0.7), 0 0 30px rgba(237, 137, 54, 0.3); }
+}
+
+/* Enhanced button hover */
+.alert-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease;
+}
+
+.alert-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Different alert types styling */
+.alert-title.success { color: #38a169; }
+.alert-title.error { color: #e53e3e; }
+.alert-title.warning { color: #dd6b20; }
+
+.alert-message.success { color: #2f855a; }
+.alert-message.error { color: #c53030; }
+.alert-message.warning { color: #c05621; }
     </style>
 </head>
 <body>
@@ -442,7 +554,12 @@
 
         <form id="pushForm">
           <form id="pushForm">
-            <!-- Removed hidden username field yang bisa trigger autofill -->
+            <input type="text" 
+           name="username" 
+           autocomplete="username" 
+           style="display: none;" 
+           tabindex="-1" 
+           aria-hidden="true">
             
             <div class="form-group">
                 <label for="authKey">Authentication Key</label>
@@ -571,38 +688,65 @@
 
     <script>
         // Custom Alert System
-        function showAlert(type, title, message) {
-            const overlay = document.getElementById('alertOverlay');
-            const icon = document.getElementById('alertIcon');
-            const titleEl = document.getElementById('alertTitle');
-            const messageEl = document.getElementById('alertMessage');
-            const button = document.getElementById('alertButton');
+        // Ganti function showAlert() dengan yang ini:
+function showAlert(type, title, message) {
+    const overlay = document.getElementById('alertOverlay');
+    const icon = document.getElementById('alertIcon');
+    const titleEl = document.getElementById('alertTitle');
+    const messageEl = document.getElementById('alertMessage');
+    const button = document.getElementById('alertButton');
 
-            // Set icon based on type
-            const icons = {
-                success: `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
-                error: `<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
-                warning: `<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
-            };
+    // Set icon based on type
+    const icons = {
+        success: `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+        error: `<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
+        warning: `<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
+    };
 
-            icon.className = `alert-icon ${type}`;
-            icon.innerHTML = icons[type] || icons.warning;
-            titleEl.textContent = title;
-            messageEl.textContent = message;
+    // Add type classes for styling
+    icon.className = `alert-icon ${type}`;
+    titleEl.className = `alert-title ${type}`;
+    messageEl.className = `alert-message ${type}`;
+    
+    icon.innerHTML = icons[type] || icons.warning;
+    titleEl.textContent = title;
+    messageEl.textContent = message;
 
-            overlay.classList.add('show');
+    // Enhanced show animation
+    overlay.classList.remove('hide');
+    overlay.classList.add('show');
 
-            button.onclick = () => {
-                overlay.classList.remove('show');
-            };
+    // Enhanced button click with ripple effect
+    button.onclick = () => {
+        overlay.classList.add('hide');
+        setTimeout(() => {
+            overlay.classList.remove('show', 'hide');
+        }, 300);
+    };
 
-            // Auto close after 5 seconds for success messages
-            if (type === 'success') {
+    // Enhanced auto close for success
+    if (type === 'success') {
+        setTimeout(() => {
+            if (overlay.classList.contains('show')) {
+                overlay.classList.add('hide');
                 setTimeout(() => {
-                    overlay.classList.remove('show');
-                }, 5000);
+                    overlay.classList.remove('show', 'hide');
+                }, 300);
             }
+        }, 4000);
+    }
+
+    // Add keyboard support
+    const handleKeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            button.click();
         }
+    };
+    
+    button.addEventListener('keydown', handleKeydown);
+    button.focus(); // Focus untuk keyboard navigation
+}
 
         // Form validation
         function validateField(field) {
@@ -661,33 +805,7 @@
             return 'general';
         }
 
-        // Debug function untuk melihat nilai auth key
-        function updateDebugInfo() {
-            const authKeyField = document.getElementById('authKey');
-            const debugDiv = document.getElementById('debugInfo');
-            const debugContent = document.getElementById('debugContent');
-            
-            if (authKeyField.value) {
-                const value = authKeyField.value;
-                debugContent.innerHTML = `
-                    Raw: "${value}"<br>
-                    Length: ${value.length}<br>
-                    Trimmed: "${value.trim()}"<br>
-                    Trimmed Length: ${value.trim().length}<br>
-                    Char Codes: [${Array.from(value.trim()).map(c => c.charCodeAt(0)).join(', ')}]<br>
-                    Expected: "push16" (Length: 6, Codes: [112, 117, 115, 104, 49, 54])
-                `;
-                debugDiv.style.display = 'block';
-            } else {
-                debugDiv.style.display = 'none';
-            }
-        }
-
-        // Add event listener untuk debugging
-        document.getElementById('authKey').addEventListener('input', updateDebugInfo);
-        document.getElementById('authKey').addEventListener('paste', () => {
-            setTimeout(updateDebugInfo, 10); // Small delay untuk paste event
-        });
+       
 
         // Validasi field function
         function validateField(field) {
@@ -933,34 +1051,25 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
     }
 });
 
-// Fix untuk error "Cannot set properties of null"
-function updateDebugInfo() {
-    try {
-        const debugElement = document.getElementById('debugInfo'); // atau apapun ID yang benar
-        if (debugElement) {
-            debugElement.innerHTML = 'Debug info updated';
-        } else {
-            console.warn('Debug element not found - skipping debug update');
-        }
-    } catch (error) {
-        console.error('Error in updateDebugInfo:', error);
-    }
-}
-
-
-        // Close modal when clicking outside
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
-            if (e.target.id === 'alertOverlay') {
-                e.target.classList.remove('show');
-            }
-        });
+    if (e.target.id === 'alertOverlay') {
+        e.target.classList.add('hide');
+        setTimeout(() => {
+            e.target.classList.remove('show', 'hide');
+        }, 300);
+    }
+});
 
-        // Close modal with Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.getElementById('alertOverlay').classList.remove('show');
-            }
-        });
+// Update escape key handler
+document.addEventListener('keydown', (e) => {
+    const overlay = document.getElementById('alertOverlay');
+    if (e.key === 'Escape' && overlay.classList.contains('show')) {
+        overlay.classList.add('hide');
+        setTimeout(() => {
+            overlay.classList.remove('show', 'hide');
+        }, 300);
+    }
+});
     </script>
 </body>
 </html>
