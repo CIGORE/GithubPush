@@ -705,7 +705,7 @@
             alert(`${title}: ${message}`);
         }
 
-        // Fixed JavaScript - paste ini ke HTML Anda yang sudah ada
+        // Fixed JavaScript dengan handling auth key yang lebih baik
 document.getElementById('pushForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -736,8 +736,8 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
     loading.style.display = 'block';
 
     try {
-        // Pastikan tidak ada whitespace atau karakter tersembunyi
-        const authKeyValue = form.authKey.value.replace(/[\r\n\t\u00A0]/g, '').trim();
+        // Clean auth key dari whitespace dan karakter tersembunyi
+        const authKeyValue = form.authKey.value.replace(/[\r\n\t\u00A0\u200B\u200C\u200D\uFEFF]/g, '').trim();
         
         const body = {
             user: form.user.value.trim(),
@@ -753,15 +753,14 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
         };
 
         // Enhanced debug log
-        console.log('=== SENDING REQUEST DEBUG ===');
-        console.log('Auth key details:');
-        console.log('- Original value:', JSON.stringify(form.authKey.value));
-        console.log('- Cleaned value:', JSON.stringify(authKeyValue));
-        console.log('- Length:', authKeyValue.length);
-        console.log('- Character codes:', Array.from(authKeyValue).map(c => c.charCodeAt(0)));
-        console.log('- Expected: push16 (codes: [112, 117, 115, 104, 49, 54])');
-        console.log('- Values match:', authKeyValue === 'push16');
-        console.log('==============================');
+        console.log('=== FRONTEND REQUEST DEBUG ===');
+        console.log('Auth key original:', JSON.stringify(form.authKey.value));
+        console.log('Auth key cleaned:', JSON.stringify(authKeyValue));
+        console.log('Auth key length:', authKeyValue.length);
+        console.log('Auth key char codes:', Array.from(authKeyValue).map(c => c.charCodeAt(0)));
+        console.log('Expected: push16 [112,117,115,104,49,54]');
+        console.log('Matches expected:', authKeyValue === 'push16');
+        console.log('================================');
 
         const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
             method: 'POST',
@@ -784,66 +783,102 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
             const textResult = await res.text();
             console.log('Non-JSON response:', textResult);
             
-            if (textResult.includes('Workflow was started')) {
+            // Handle text responses yang mungkin mengandung error
+            if (textResult.toLowerCase().includes('invalid authentication') || 
+                textResult.toLowerCase().includes('unauthorized')) {
                 result = {
                     success: false,
                     error: true,
-                    message: 'Workflow started but no proper response received.'
+                    code: 'AUTH_ERROR',
+                    message: 'Authentication failed - invalid key'
+                };
+            } else if (textResult.includes('Workflow was started')) {
+                result = {
+                    success: false,
+                    error: true,
+                    message: 'Workflow started but returned unexpected response: ' + textResult
                 };
             } else {
                 result = {
                     success: false,
                     error: true,
-                    message: 'Invalid response format from server: ' + textResult
+                    message: 'Server returned invalid response: ' + textResult
                 };
             }
         }
 
         console.log('Parsed result:', result);
 
-        // Handle success
-        if (result.success === true && !result.error) {
+        // Handle response berdasarkan struktur yang benar
+        if (result.success === true && result.error !== true) {
+            // Success case
             showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
             form.reset();
             fields.forEach(field => {
                 field.classList.remove('success', 'error');
             });
         } else {
-            // Handle errors
+            // Error case - handle berbagai jenis error
             const errorMessage = result.message || 'Unknown error occurred';
-            console.log('Error detected:', errorMessage);
+            const errorCode = result.code || '';
             
-            if (errorMessage.includes('Invalid authentication key') || 
-                errorMessage.includes('Unauthorized') ||
-                result.code === 'AUTH_ERROR') {
+            console.log('Error details:', { errorMessage, errorCode, result });
+            
+            // Specific error handling berdasarkan kode atau pesan
+            if (errorCode === 'AUTH_ERROR' || 
+                errorMessage.toLowerCase().includes('invalid authentication') ||
+                errorMessage.toLowerCase().includes('authentication key')) {
                 
-                // Tampilkan detail untuk debugging
-                console.log('AUTH ERROR DEBUG:');
-                console.log('- Frontend sent:', JSON.stringify(authKeyValue));
-                console.log('- Expected by server: push16');
-                console.log('- Character comparison complete');
+                console.log('AUTH ERROR DETECTED:');
+                console.log('- Client sent:', JSON.stringify(authKeyValue));
+                console.log('- Server expected: push16');
                 
-                showAlert('warning', '🔐 Authentication Failed', 
-                    `Invalid authentication key detected by server.\n` +
-                    `Frontend value: "${authKeyValue}" (length: ${authKeyValue.length})\n` +
-                    `This suggests the N8N workflow has an issue.`);
+                if (authKeyValue === 'push16') {
+                    // Auth key benar tapi server tetap reject
+                    showAlert('warning', '🔐 Authentication Issue', 
+                        'Auth key is correct on frontend but server validation failed. This may be a server-side issue or encoding problem.');
+                } else {
+                    // Auth key memang salah
+                    showAlert('error', '🔐 Invalid Authentication Key', 
+                        'The authentication key you entered is incorrect. Please check and try again.');
+                }
                 form.authKey.focus();
+                form.authKey.select();
                 
-            } else if (errorMessage.includes('Missing required fields')) {
+            } else if (errorCode === 'VALIDATION_ERROR' || 
+                       errorMessage.toLowerCase().includes('missing required fields')) {
                 showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
-            } else if (errorMessage.includes('Repository not found')) {
+                
+            } else if (errorMessage.toLowerCase().includes('repository not found')) {
                 showAlert('error', '📁 Repository Not Found', 'The specified repository does not exist or is not accessible.');
-            } else if (errorMessage.includes('Permission denied')) {
-                showAlert('error', '🚫 Permission Denied', 'You do not have permission to push to this repository.');
+                form.repo.focus();
+                
+            } else if (errorMessage.toLowerCase().includes('permission denied') ||
+                       errorMessage.toLowerCase().includes('unauthorized')) {
+                showAlert('error', '🚫 Permission Denied', 'You do not have permission to push to this repository. Check your GitHub credentials.');
+                
+            } else if (errorMessage.toLowerCase().includes('git') ||
+                       errorMessage.toLowerCase().includes('push failed')) {
+                showAlert('error', '📤 Git Push Failed', 'Failed to push to repository: ' + errorMessage);
+                
             } else {
+                // Generic error
                 showAlert('error', 'Push Failed', errorMessage);
             }
         }
 
     } catch (error) {
         console.error('Network/Parse error:', error);
-        showAlert('warning', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+        
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            showAlert('error', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+        } else if (error.name === 'SyntaxError') {
+            showAlert('warning', '⚠️ Response Format Error', 'Server returned invalid response format. The request may have been processed incorrectly.');
+        } else {
+            showAlert('error', 'Unexpected Error', 'An unexpected error occurred: ' + error.message);
+        }
     } finally {
+        // Always reset loading state
         submitBtn.disabled = false;
         form.classList.remove('form-loading');
         btnText.textContent = 'Push to GitHub';
