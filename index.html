@@ -443,13 +443,21 @@
         <form id="pushForm">
             <input type="text" name="username" id="username" autocomplete="username" style="display: none;" />
             <div class="form-group">
-                <label for="authKey">Authentication Key</label>
-                <div class="input-wrapper">
-                    <input type="password" id="authKey" name="authKey" placeholder="Enter your secret key" value="" required autocomplete="current-password" />
-                    <div class="error-message">Please enter a valid authentication key</div>
-                </div>
-            </div>
-
+    <label for="authKey">Authentication Key</label>
+    <div class="input-wrapper">
+        <input 
+            type="password"
+            id="authKey"
+            name="authKey"
+            class="form-control"
+            placeholder="Enter your secret key"
+            value=""
+            required
+            autocomplete="current-password"
+        />
+        <div class="error-message">Please enter a valid authentication key</div>
+    </div>
+</div>
             <div class="form-group">
                 <label for="user">GitHub Username</label>
                 <div class="input-wrapper">
@@ -462,7 +470,7 @@
             <div class="form-group">
                 <label for="repo">Repository Name</label>
                 <div class="input-wrapper">
-                  <input type="text" id="repo" name="repo" class="form-control" placeholder="Enter repository name" required pattern="[a-zA-Z0-9_.-]+" />
+                  <input type="text" id="repo" name="repo" class="form-control" placeholder="Enter repository name" required pattern="[-a-zA-Z0-9_.]+" />
                     <div class="error-message">Please enter a valid repository name</div>
                 </div>
             </div>
