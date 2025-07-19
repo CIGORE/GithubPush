@@ -705,7 +705,7 @@
             alert(`${title}: ${message}`);
         }
 
-        // Fixed JavaScript dengan handling auth key yang lebih baik
+    // Fixed JavaScript dengan debugging yang lebih komprehensif
 document.getElementById('pushForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -736,14 +736,18 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
     loading.style.display = 'block';
 
     try {
-        // Clean auth key dari whitespace dan karakter tersembunyi
-        const authKeyValue = form.authKey.value.replace(/[\r\n\t\u00A0\u200B\u200C\u200D\uFEFF]/g, '').trim();
+        // Clean auth key dengan lebih hati-hati
+        const rawAuthKey = form.authKey.value;
+        const authKeyValue = rawAuthKey
+            .replace(/[\r\n\t\u00A0\u200B\u200C\u200D\uFEFF]/g, '')
+            .trim();
         
-        const body = {
+        // PERBAIKAN: Pastikan authKey benar-benar ada di body
+        const requestBody = {
             user: form.user.value.trim(),
             repo: form.repo.value.trim(),
             message: form.message.value.trim(),
-            authKey: authKeyValue,
+            authKey: authKeyValue, // Pastikan field ini ada
             files: [
                 {
                     name: form.fileName.value.trim(),
@@ -752,15 +756,22 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
             ]
         };
 
-        // Enhanced debug log
-        console.log('=== FRONTEND REQUEST DEBUG ===');
-        console.log('Auth key original:', JSON.stringify(form.authKey.value));
-        console.log('Auth key cleaned:', JSON.stringify(authKeyValue));
+        // Enhanced debug log - CEK STRUKTUR BODY
+        console.log('=== COMPREHENSIVE FRONTEND DEBUG ===');
+        console.log('Raw form auth key:', JSON.stringify(rawAuthKey));
+        console.log('Cleaned auth key:', JSON.stringify(authKeyValue));
         console.log('Auth key length:', authKeyValue.length);
         console.log('Auth key char codes:', Array.from(authKeyValue).map(c => c.charCodeAt(0)));
         console.log('Expected: push16 [112,117,115,104,49,54]');
         console.log('Matches expected:', authKeyValue === 'push16');
-        console.log('================================');
+        console.log('');
+        console.log('COMPLETE REQUEST BODY:');
+        console.log(JSON.stringify(requestBody, null, 2));
+        console.log('');
+        console.log('Body.authKey exists:', 'authKey' in requestBody);
+        console.log('Body.authKey value:', JSON.stringify(requestBody.authKey));
+        console.log('Body.authKey type:', typeof requestBody.authKey);
+        console.log('=====================================');
 
         const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
             method: 'POST',
@@ -768,7 +779,7 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(requestBody)
         });
 
         console.log('Response status:', res.status);
@@ -783,7 +794,6 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
             const textResult = await res.text();
             console.log('Non-JSON response:', textResult);
             
-            // Handle text responses yang mungkin mengandung error
             if (textResult.toLowerCase().includes('invalid authentication') || 
                 textResult.toLowerCase().includes('unauthorized')) {
                 result = {
@@ -807,38 +817,45 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
             }
         }
 
-        console.log('Parsed result:', result);
+        console.log('SERVER RESPONSE:', JSON.stringify(result, null, 2));
 
-        // Handle response berdasarkan struktur yang benar
+        // Handle response
         if (result.success === true && result.error !== true) {
-            // Success case
             showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
             form.reset();
             fields.forEach(field => {
                 field.classList.remove('success', 'error');
             });
         } else {
-            // Error case - handle berbagai jenis error
             const errorMessage = result.message || 'Unknown error occurred';
             const errorCode = result.code || '';
             
-            console.log('Error details:', { errorMessage, errorCode, result });
+            console.log('=== ERROR ANALYSIS ===');
+            console.log('Error message:', errorMessage);
+            console.log('Error code:', errorCode);
+            console.log('Full result:', result);
             
-            // Specific error handling berdasarkan kode atau pesan
-            if (errorCode === 'AUTH_ERROR' || 
-                errorMessage.toLowerCase().includes('invalid authentication') ||
-                errorMessage.toLowerCase().includes('authentication key')) {
+            // IMPROVED: Jika server bilang "Authentication key is required" 
+            // tapi kita sudah kirim, ini kemungkinan parsing issue
+            if (errorMessage.includes('Authentication key is required')) {
+                console.log('=== AUTH KEY REQUIRED ERROR ===');
+                console.log('This suggests server is not receiving authKey field');
+                console.log('Possible causes:');
+                console.log('1. JSON parsing issue on server');
+                console.log('2. Server expects different field name');
+                console.log('3. Middleware stripping the field');
+                console.log('==============================');
                 
-                console.log('AUTH ERROR DETECTED:');
-                console.log('- Client sent:', JSON.stringify(authKeyValue));
-                console.log('- Server expected: push16');
+                showAlert('error', '🔐 Server Auth Key Issue', 
+                    `Server reports "Authentication key is required" but we sent "${authKeyValue}". This suggests a server-side parsing issue. Check server logs for JSON parsing errors.`);
+                    
+            } else if (errorCode === 'AUTH_ERROR' || 
+                       errorMessage.toLowerCase().includes('invalid authentication')) {
                 
                 if (authKeyValue === 'push16') {
-                    // Auth key benar tapi server tetap reject
                     showAlert('warning', '🔐 Authentication Issue', 
-                        'Auth key is correct on frontend but server validation failed. This may be a server-side issue or encoding problem.');
+                        'Auth key is correct but server validation failed. Check server-side validation logic.');
                 } else {
-                    // Auth key memang salah
                     showAlert('error', '🔐 Invalid Authentication Key', 
                         'The authentication key you entered is incorrect. Please check and try again.');
                 }
@@ -849,20 +866,7 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
                        errorMessage.toLowerCase().includes('missing required fields')) {
                 showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
                 
-            } else if (errorMessage.toLowerCase().includes('repository not found')) {
-                showAlert('error', '📁 Repository Not Found', 'The specified repository does not exist or is not accessible.');
-                form.repo.focus();
-                
-            } else if (errorMessage.toLowerCase().includes('permission denied') ||
-                       errorMessage.toLowerCase().includes('unauthorized')) {
-                showAlert('error', '🚫 Permission Denied', 'You do not have permission to push to this repository. Check your GitHub credentials.');
-                
-            } else if (errorMessage.toLowerCase().includes('git') ||
-                       errorMessage.toLowerCase().includes('push failed')) {
-                showAlert('error', '📤 Git Push Failed', 'Failed to push to repository: ' + errorMessage);
-                
             } else {
-                // Generic error
                 showAlert('error', 'Push Failed', errorMessage);
             }
         }
@@ -878,13 +882,26 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
             showAlert('error', 'Unexpected Error', 'An unexpected error occurred: ' + error.message);
         }
     } finally {
-        // Always reset loading state
         submitBtn.disabled = false;
         form.classList.remove('form-loading');
         btnText.textContent = 'Push to GitHub';
         loading.style.display = 'none';
     }
 });
+
+// Fix untuk error "Cannot set properties of null"
+function updateDebugInfo() {
+    try {
+        const debugElement = document.getElementById('debugInfo'); // atau apapun ID yang benar
+        if (debugElement) {
+            debugElement.innerHTML = 'Debug info updated';
+        } else {
+            console.warn('Debug element not found - skipping debug update');
+        }
+    } catch (error) {
+        console.error('Error in updateDebugInfo:', error);
+    }
+}
 
         // Close modal when clicking outside
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
