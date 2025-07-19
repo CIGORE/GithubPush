@@ -606,37 +606,46 @@
             btnText.textContent = 'Pushing...';
             loading.style.display = 'block';
 
-            try {
-                const body = {
-                    user: form.user.value.trim(),
-                    repo: form.repo.value.trim(),
-                    message: form.message.value.trim(),
-                    auth: form.authKey.value.trim(),
-                    files: [
-                        {
-                            name: form.fileName.value.trim(),
-                            content: form.fileContent.value
-                        }
-                    ]
-                };
+           try {
+  const body = {
+    user: form.user.value.trim(),
+    repo: form.repo.value.trim(),
+    message: form.message.value.trim(),
+    authKey: form.authKey.value.trim(),
+    files: [
+      {
+        name: form.fileName.value.trim(),
+        content: form.fileContent.value
+      }
+    ]
+  };
 
-                const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
+  const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
 
-                const result = await res.json();
+  const result = await res.json();
 
-              if (res.ok) {
-
+  if (res.ok && !result.error) {
     showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
     form.reset();
     fields.forEach(field => {
-        field.classList.remove('success', 'error');
+      field.classList.remove('success', 'error');
     });
-} else {
+  } else {
     showAlert('error', 'Push Failed', result.message || 'An unexpected error occurred while pushing to GitHub. Please check your credentials and try again.');
+  }
+
+} catch (error) {
+  console.error('Network error:', error);
+  showAlert('warning', 'Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+} finally {
+  submitBtn.disabled = false;
+  form.classList.remove('form-loading');
+  btnText.textContent = 'Push to GitHub';
+  loading.style.display = 'none';
 }
 
 
