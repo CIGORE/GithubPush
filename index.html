@@ -628,27 +628,16 @@
 
                 const result = await res.json();
 
-                if (res.ok) {
-                    showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
-                    form.reset();
-                    // Remove validation classes
-                    fields.forEach(field => {
-                        field.classList.remove('success', 'error');
-                    });
-                } else {
-                    showAlert('error', 'Push Failed', result.message || 'An unexpected error occurred while pushing to GitHub. Please check your credentials and try again.');
-                }
-            } catch (error) {
-                console.error('Network error:', error);
-                showAlert('warning', 'Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
-            } finally {
-                // Reset loading state
-                submitBtn.disabled = false;
-                form.classList.remove('form-loading');
-                btnText.textContent = 'Push to GitHub';
-                loading.style.display = 'none';
-            }
-        });
+              if (res.ok && !result.error) {
+    showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
+    form.reset();
+    fields.forEach(field => {
+        field.classList.remove('success', 'error');
+    });
+} else {
+    showAlert('error', 'Push Failed', result.message || 'An unexpected error occurred while pushing to GitHub. Please check your credentials and try again.');
+}
+
 
         // Close modal when clicking outside
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
