@@ -611,118 +611,151 @@
             return 'general';
         }
 
-        // Form submission
-        document.getElementById('pushForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Form submission dengan debugging yang lebih detail
+document.getElementById('pushForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            const form = e.target;
-            const submitBtn = form.querySelector('.submit-btn');
-            const btnText = submitBtn.querySelector('.btn-text');
-            const loading = submitBtn.querySelector('.loading-spinner');
+    const form = e.target;
+    const submitBtn = form.querySelector('.submit-btn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const loading = submitBtn.querySelector('.loading-spinner');
 
-            // Validate all fields
-            const fields = form.querySelectorAll('.form-control');
-            let isFormValid = true;
+    // Validate all fields
+    const fields = form.querySelectorAll('.form-control');
+    let isFormValid = true;
 
-            fields.forEach(field => {
-                if (!validateField(field)) {
-                    isFormValid = false;
+    fields.forEach(field => {
+        if (!validateField(field)) {
+            isFormValid = false;
+        }
+    });
+
+    if (!isFormValid) {
+        showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
+        return;
+    }
+
+    // Start loading state
+    submitBtn.disabled = true;
+    form.classList.add('form-loading');
+    btnText.textContent = 'Pushing...';
+    loading.style.display = 'block';
+
+    try {
+        const body = {
+            user: form.user.value.trim(),
+            repo: form.repo.value.trim(),
+            message: form.message.value.trim(),
+            authKey: form.authKey.value.trim(),
+            files: [
+                {
+                    name: form.fileName.value.trim(),
+                    content: form.fileContent.value
                 }
-            });
+            ]
+        };
 
-            if (!isFormValid) {
-                showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
-                return;
-            }
-
-            // Start loading state
-            submitBtn.disabled = true;
-            form.classList.add('form-loading');
-            btnText.textContent = 'Pushing...';
-            loading.style.display = 'block';
-
-            try {
-                const body = {
-                    user: form.user.value.trim(),
-                    repo: form.repo.value.trim(),
-                    message: form.message.value.trim(),
-                    authKey: form.authKey.value.trim(),
-                    files: [
-                        {
-                            name: form.fileName.value.trim(),
-                            content: form.fileContent.value
-                        }
-                    ]
-                };
-
-                const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-
-                const result = await res.json();
-
-                // Check if the workflow executed successfully
-                if (res.ok && result.success === true) {
-                    showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
-                    form.reset();
-                    fields.forEach(field => {
-                        field.classList.remove('success', 'error');
-                    });
-                } else {
-                    // Handle different error types
-                    const errorMessage = result.message || 'Unknown error occurred';
-                    const errorType = getErrorType(errorMessage);
-                    
-                    let title = 'Push Failed';
-                    let message = errorMessage;
-                    let alertType = 'error';
-
-                    switch (errorType) {
-                        case 'auth':
-                            title = '🔐 Authentication Failed';
-                            message = 'Invalid authentication key. Please check your secret key and try again.';
-                            alertType = 'warning';
-                            // Clear the auth key field for security
-                            form.authKey.value = '';
-                            form.authKey.focus();
-                            break;
-                            
-                        case 'repo':
-                            title = '📁 Repository Not Found';
-                            message = 'The specified repository does not exist or is not accessible. Please check the username and repository name.';
-                            break;
-                            
-                        case 'permission':
-                            title = '🚫 Permission Denied';
-                            message = 'You do not have permission to push to this repository. Check your GitHub access rights.';
-                            break;
-                            
-                        case 'network':
-                            title = '🌐 Connection Error';
-                            message = 'Unable to connect to GitHub. Please check your internet connection and try again.';
-                            alertType = 'warning';
-                            break;
-                            
-                        default:
-                            title = 'Push Failed';
-                            message = errorMessage || 'An unexpected error occurred while pushing to GitHub. Please try again.';
-                    }
-
-                    showAlert(alertType, title, message);
-                }
-
-            } catch (error) {
-                console.error('Network error:', error);
-                showAlert('warning', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
-            } finally {
-                submitBtn.disabled = false;
-                form.classList.remove('form-loading');
-                btnText.textContent = 'Push to GitHub';
-                loading.style.display = 'none';
-            }
+        // Debug log
+        console.log('Sending request with body:', {
+            ...body,
+            authKey: '***' // Hide auth key in log
         });
+
+        const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        console.log('Response status:', res.status);
+        console.log('Response headers:', Object.fromEntries(res.headers.entries()));
+
+        let result;
+        const contentType = res.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            result = await res.json();
+        } else {
+            const textResult = await res.text();
+            console.log('Non-JSON response:', textResult);
+            
+            // Try to extract meaningful info from text response
+            if (textResult.includes('Workflow was started')) {
+                result = {
+                    success: false,
+                    error: true,
+                    message: 'Workflow started but no proper response received. This usually indicates an error in the workflow execution.'
+                };
+            } else {
+                result = {
+                    success: false,
+                    error: true,
+                    message: 'Invalid response format from server: ' + textResult
+                };
+            }
+        }
+
+        console.log('Parsed result:', result);
+
+        // Handle success
+        if (result.success === true && !result.error) {
+            showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
+            form.reset();
+            fields.forEach(field => {
+                field.classList.remove('success', 'error');
+            });
+        } else {
+            // Handle errors with detailed messages
+            const errorMessage = result.message || 'Unknown error occurred';
+            
+            console.log('Error detected:', errorMessage);
+            
+            // Check for specific error types
+            if (errorMessage.includes('Invalid authentication key') || 
+                errorMessage.includes('Unauthorized') ||
+                result.code === 'AUTH_ERROR') {
+                
+                showAlert('warning', '🔐 Authentication Failed', 'Invalid authentication key. Please check your secret key and try again.');
+                form.authKey.value = '';
+                form.authKey.focus();
+                
+            } else if (errorMessage.includes('Missing required fields') || 
+                       result.code === 'VALIDATION_ERROR') {
+                       
+                showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
+                
+            } else if (errorMessage.includes('Repository not found') || 
+                       errorMessage.includes('404')) {
+                       
+                showAlert('error', '📁 Repository Not Found', 'The specified repository does not exist or is not accessible.');
+                
+            } else if (errorMessage.includes('Permission denied') || 
+                       errorMessage.includes('403')) {
+                       
+                showAlert('error', '🚫 Permission Denied', 'You do not have permission to push to this repository.');
+                
+            } else if (errorMessage.includes('Workflow started but no proper response')) {
+                
+                showAlert('warning', '⚠️ Workflow Issue', 'The workflow started but encountered an issue. Please check your inputs and try again.');
+                
+            } else {
+                showAlert('error', 'Push Failed', errorMessage);
+            }
+        }
+
+    } catch (error) {
+        console.error('Network/Parse error:', error);
+        showAlert('warning', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+    } finally {
+        submitBtn.disabled = false;
+        form.classList.remove('form-loading');
+        btnText.textContent = 'Push to GitHub';
+        loading.style.display = 'none';
+    }
+});
 
         // Close modal when clicking outside
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
