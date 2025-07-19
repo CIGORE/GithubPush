@@ -553,14 +553,12 @@
         </div>
 
         <form id="pushForm">
-          <form id="pushForm">
             <input type="text" 
-           name="username" 
-           autocomplete="username" 
-           style="display: none;" 
-           tabindex="-1" 
-           aria-hidden="true">
-            
+                name="username" 
+                autocomplete="username" 
+                style="display: none;" 
+                tabindex="-1" 
+                aria-hidden="true">
             <div class="form-group">
                 <label for="authKey">Authentication Key</label>
                 <div class="input-wrapper">
@@ -579,7 +577,6 @@
                     <div class="error-message">Please enter a valid authentication key</div>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="user">GitHub Username</label>
                 <div class="input-wrapper">
@@ -597,7 +594,6 @@
                     <div class="error-message">Please enter a valid GitHub username</div>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="repo">Repository Name</label>
                 <div class="input-wrapper">
@@ -615,7 +611,6 @@
                     <div class="error-message">Please enter a valid repository name</div>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="message">Commit Message</label>
                 <div class="input-wrapper">
@@ -631,7 +626,6 @@
                     <div class="error-message">Please enter a commit message</div>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="fileContent">File Content</label>
                 <div class="input-wrapper">
@@ -647,7 +641,6 @@
                     <div class="error-message">Please enter the file content</div>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="fileName">File Name</label>
                 <div class="input-wrapper">
@@ -664,7 +657,6 @@
                     <div class="error-message">Please enter a valid file name</div>
                 </div>
             </div>
-            
             <button type="submit" class="submit-btn">
                 <div class="btn-content">
                     <span class="btn-text">Push to GitHub</span>
@@ -673,89 +665,68 @@
             </button>
         </form>
     </div>
-
     <!-- Custom Alert Modal -->
     <div id="alertOverlay" class="alert-overlay">
         <div class="alert-modal">
-            <div id="alertIcon" class="alert-icon">
-                <!-- Icon will be dynamically inserted -->
-            </div>
+            <div id="alertIcon" class="alert-icon"></div>
             <h3 id="alertTitle" class="alert-title"></h3>
             <p id="alertMessage" class="alert-message"></p>
             <button id="alertButton" class="alert-button">OK</button>
         </div>
     </div>
-
     <script>
-        // Custom Alert System
-        // Ganti function showAlert() dengan yang ini:
-function showAlert(type, title, message) {
-    const overlay = document.getElementById('alertOverlay');
-    const icon = document.getElementById('alertIcon');
-    const titleEl = document.getElementById('alertTitle');
-    const messageEl = document.getElementById('alertMessage');
-    const button = document.getElementById('alertButton');
-
-    // Set icon based on type
-    const icons = {
-        success: `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
-        error: `<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
-        warning: `<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
-    };
-
-    // Add type classes for styling
-    icon.className = `alert-icon ${type}`;
-    titleEl.className = `alert-title ${type}`;
-    messageEl.className = `alert-message ${type}`;
-    
-    icon.innerHTML = icons[type] || icons.warning;
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-
-    // Enhanced show animation
-    overlay.classList.remove('hide');
-    overlay.classList.add('show');
-
-    // Enhanced button click with ripple effect
-    button.onclick = () => {
-        overlay.classList.add('hide');
-        setTimeout(() => {
-            overlay.classList.remove('show', 'hide');
-        }, 300);
-    };
-
-    // Enhanced auto close for success
-    if (type === 'success') {
-        setTimeout(() => {
-            if (overlay.classList.contains('show')) {
+        // Alert Modal
+        function showAlert(type, title, message) {
+            const overlay = document.getElementById('alertOverlay');
+            const icon = document.getElementById('alertIcon');
+            const titleEl = document.getElementById('alertTitle');
+            const messageEl = document.getElementById('alertMessage');
+            const button = document.getElementById('alertButton');
+            const icons = {
+                success: `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+                error: `<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
+                warning: `<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
+            };
+            icon.className = `alert-icon ${type}`;
+            titleEl.className = `alert-title ${type}`;
+            messageEl.className = `alert-message ${type}`;
+            icon.innerHTML = icons[type] || icons.warning;
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            overlay.classList.remove('hide');
+            overlay.classList.add('show');
+            button.onclick = () => {
                 overlay.classList.add('hide');
                 setTimeout(() => {
                     overlay.classList.remove('show', 'hide');
                 }, 300);
+            };
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (overlay.classList.contains('show')) {
+                        overlay.classList.add('hide');
+                        setTimeout(() => {
+                            overlay.classList.remove('show', 'hide');
+                        }, 300);
+                    }
+                }, 4000);
             }
-        }, 4000);
-    }
-
-    // Add keyboard support
-    const handleKeydown = (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            button.click();
+            const handleKeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    button.click();
+                }
+            };
+            button.addEventListener('keydown', handleKeydown);
+            button.focus();
         }
-    };
-    
-    button.addEventListener('keydown', handleKeydown);
-    button.focus(); // Focus untuk keyboard navigation
-}
 
         // Form validation
         function validateField(field) {
             const value = field.value.trim();
             const isValid = field.checkValidity() && value.length > 0;
-            
             field.classList.toggle('error', !isValid);
             field.classList.toggle('success', isValid);
-            
             return isValid;
         }
 
@@ -769,307 +740,175 @@ function showAlert(type, title, message) {
             });
         });
 
-        // Error message detection function
-        function getErrorType(errorMessage) {
-            const lowerMsg = errorMessage.toLowerCase();
-            
-            // Check for authentication errors
-            if (lowerMsg.includes('unauthorized') || 
-                lowerMsg.includes('invalid auth key') || 
-                lowerMsg.includes('authentication failed') ||
-                lowerMsg.includes('❌ unauthorized')) {
-                return 'auth';
-            }
-            
-            // Check for repository errors
-            if (lowerMsg.includes('repository not found') || 
-                lowerMsg.includes('repo does not exist') ||
-                lowerMsg.includes('404')) {
-                return 'repo';
-            }
-            
-            // Check for permission errors
-            if (lowerMsg.includes('permission denied') || 
-                lowerMsg.includes('403') ||
-                lowerMsg.includes('access denied')) {
-                return 'permission';
-            }
-            
-            // Check for network errors
-            if (lowerMsg.includes('network') || 
-                lowerMsg.includes('connection') ||
-                lowerMsg.includes('timeout')) {
-                return 'network';
-            }
-            
-            return 'general';
-        }
-
-       
-
-        // Validasi field function
-        function validateField(field) {
-            const value = field.value.trim();
-            if (!value) {
-                field.classList.add('error');
-                return false;
-            }
-            field.classList.remove('error');
-            return true;
-        }
-
-        // Alert function (placeholder - ganti dengan implementasi Anda)
-        function showAlert(type, title, message) {
-            alert(`${title}: ${message}`);
-        }
-
-   // Fixed JavaScript dengan debugging yang lebih komprehensif
-document.getElementById('pushForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-    const submitBtn = form.querySelector('.submit-btn');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const loading = submitBtn.querySelector('.loading-spinner');
-
-    // Validate all fields
-    const fields = form.querySelectorAll('.form-control');
-    let isFormValid = true;
-
-    fields.forEach(field => {
-        if (!validateField(field)) {
-            isFormValid = false;
-        }
-    });
-
-    if (!isFormValid) {
-        showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
-        return;
-    }
-
-    // Start loading state
-    submitBtn.disabled = true;
-    form.classList.add('form-loading');
-    btnText.textContent = 'Pushing...';
-    loading.style.display = 'block';
-
-    try {
-        // Clean auth key dengan lebih hati-hati
-        const rawAuthKey = form.authKey.value;
-        const authKeyValue = rawAuthKey
-            .replace(/[\r\n\t\u00A0\u200B\u200C\u200D\uFEFF]/g, '')
-            .trim();
-        
-        // PERBAIKAN: Pastikan authKey benar-benar ada di body
-        const requestBody = {
-            user: form.user.value.trim(),
-            repo: form.repo.value.trim(),
-            message: form.message.value.trim(),
-            authKey: authKeyValue, // Pastikan field ini ada
-            files: [
-                {
-                    name: form.fileName.value.trim(),
-                    content: form.fileContent.value
+        document.getElementById('pushForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('.submit-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const loading = submitBtn.querySelector('.loading-spinner');
+            const fields = form.querySelectorAll('.form-control');
+            let isFormValid = true;
+            fields.forEach(field => {
+                if (!validateField(field)) {
+                    isFormValid = false;
                 }
-            ]
-        };
-
-        // Enhanced debug log - CEK STRUKTUR BODY
-        console.log('=== COMPREHENSIVE FRONTEND DEBUG ===');
-        console.log('Raw form auth key:', JSON.stringify(rawAuthKey));
-        console.log('Cleaned auth key:', JSON.stringify(authKeyValue));
-        console.log('Auth key length:', authKeyValue.length);
-        console.log('Auth key char codes:', Array.from(authKeyValue).map(c => c.charCodeAt(0)));
-        console.log('Expected: push16 [112,117,115,104,49,54]');
-        console.log('Matches expected:', authKeyValue === 'push16');
-        console.log('');
-        console.log('COMPLETE REQUEST BODY:');
-        console.log(JSON.stringify(requestBody, null, 2));
-        console.log('');
-        console.log('Body.authKey exists:', 'authKey' in requestBody);
-        console.log('Body.authKey value:', JSON.stringify(requestBody.authKey));
-        console.log('Body.authKey type:', typeof requestBody.authKey);
-        console.log('=====================================');
-
-        const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        console.log('Response status:', res.status);
-        console.log('Response headers:', Object.fromEntries(res.headers.entries()));
-
-        let result;
-        const contentType = res.headers.get('content-type');
-        const contentLength = res.headers.get('content-length');
-        
-        console.log('Response content-length:', contentLength);
-        console.log('Response content-type:', contentType);
-        
-        // PERBAIKAN: Handle empty response (content-length: 0)
-        if (contentLength === '0' || contentLength === 0) {
-            console.log('Empty response detected - workflow likely succeeded');
-            
-            // Empty response dari N8N biasanya berarti workflow berhasil
-            result = {
-                success: true,
-                error: false,
-                message: 'Push completed successfully! (Empty response from server indicates success)'
-            };
-        } else if (contentType && contentType.includes('application/json')) {
+            });
+            if (!isFormValid) {
+                showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
+                return;
+            }
+            submitBtn.disabled = true;
+            form.classList.add('form-loading');
+            btnText.textContent = 'Pushing...';
+            loading.style.display = 'block';
             try {
-                const responseText = await res.text();
-                console.log('Raw response text:', responseText);
-                
-                if (responseText.trim() === '') {
-                    console.log('Empty JSON response - treating as success');
+                const rawAuthKey = form.authKey.value;
+                const authKeyValue = rawAuthKey
+                    .replace(/[\r\n\t\u00A0\u200B\u200C\u200D\uFEFF]/g, '')
+                    .trim();
+                const requestBody = {
+                    user: form.user.value.trim(),
+                    repo: form.repo.value.trim(),
+                    message: form.message.value.trim(),
+                    authKey: authKeyValue,
+                    files: [
+                        {
+                            name: form.fileName.value.trim(),
+                            content: form.fileContent.value
+                        }
+                    ]
+                };
+                const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                let result;
+                const contentType = res.headers.get('content-type');
+                const contentLength = res.headers.get('content-length');
+                if (contentLength === '0' || contentLength === 0) {
                     result = {
                         success: true,
                         error: false,
-                        message: 'Push completed successfully! (Empty JSON response)'
+                        message: 'Push completed successfully! (Empty response from server indicates success)'
                     };
+                } else if (contentType && contentType.includes('application/json')) {
+                    try {
+                        const responseText = await res.text();
+                        if (responseText.trim() === '') {
+                            result = {
+                                success: true,
+                                error: false,
+                                message: 'Push completed successfully! (Empty JSON response)'
+                            };
+                        } else {
+                            result = JSON.parse(responseText);
+                        }
+                    } catch (parseError) {
+                        result = {
+                            success: false,
+                            error: true,
+                            message: 'Server returned invalid JSON response. The workflow may have started but response was malformed.',
+                            code: 'PARSE_ERROR'
+                        };
+                    }
                 } else {
-                    result = JSON.parse(responseText);
+                    const textResult = await res.text();
+                    if (textResult.toLowerCase().includes('invalid authentication') || 
+                        textResult.toLowerCase().includes('unauthorized')) {
+                        result = {
+                            success: false,
+                            error: true,
+                            code: 'AUTH_ERROR',
+                            message: 'Authentication failed - invalid key'
+                        };
+                    } else if (textResult.includes('Workflow was started')) {
+                        result = {
+                            success: true,
+                            error: false,
+                            message: 'Workflow started successfully: ' + textResult
+                        };
+                    } else if (textResult.trim() === '') {
+                        result = {
+                            success: true,
+                            error: false,
+                            message: 'Push completed successfully! (Empty response from server)'
+                        };
+                    } else {
+                        result = {
+                            success: false,
+                            error: true,
+                            message: 'Server returned unexpected response: ' + textResult
+                        };
+                    }
                 }
-            } catch (parseError) {
-                console.log('JSON parse error:', parseError);
-                console.log('Response might be malformed JSON');
-                
-                result = {
-                    success: false,
-                    error: true,
-                    message: 'Server returned invalid JSON response. The workflow may have started but response was malformed.',
-                    code: 'PARSE_ERROR'
-                };
-            }
-        } else {
-            const textResult = await res.text();
-            console.log('Non-JSON response:', textResult);
-            
-            if (textResult.toLowerCase().includes('invalid authentication') || 
-                textResult.toLowerCase().includes('unauthorized')) {
-                result = {
-                    success: false,
-                    error: true,
-                    code: 'AUTH_ERROR',
-                    message: 'Authentication failed - invalid key'
-                };
-            } else if (textResult.includes('Workflow was started')) {
-                result = {
-                    success: true,
-                    error: false,
-                    message: 'Workflow started successfully: ' + textResult
-                };
-            } else if (textResult.trim() === '') {
-                result = {
-                    success: true,
-                    error: false,
-                    message: 'Push completed successfully! (Empty response from server)'
-                };
-            } else {
-                result = {
-                    success: false,
-                    error: true,
-                    message: 'Server returned unexpected response: ' + textResult
-                };
-            }
-        }
-
-        console.log('SERVER RESPONSE:', JSON.stringify(result, null, 2));
-
-        // Handle response dengan logging yang lebih baik
-        if (result.success === true && result.error !== true) {
-            showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
-            form.reset();
-            fields.forEach(field => {
-                field.classList.remove('success', 'error');
-            });
-        } else {
-            const errorMessage = result.message || 'Unknown error occurred';
-            const errorCode = result.code || '';
-            
-            console.log('=== ERROR ANALYSIS ===');
-            console.log('Error message:', errorMessage);
-            console.log('Error code:', errorCode);
-            console.log('Full result:', result);
-            
-            // IMPROVED: Jika server bilang "Authentication key is required" 
-            // tapi kita sudah kirim, ini kemungkinan parsing issue
-            if (errorMessage.includes('Authentication key is required')) {
-                console.log('=== AUTH KEY REQUIRED ERROR ===');
-                console.log('This suggests server is not receiving authKey field');
-                console.log('Possible causes:');
-                console.log('1. JSON parsing issue on server');
-                console.log('2. Server expects different field name');
-                console.log('3. Middleware stripping the field');
-                console.log('==============================');
-                
-                showAlert('error', '🔐 Server Auth Key Issue', 
-                    `Server reports "Authentication key is required" but we sent "${authKeyValue}". This suggests a server-side parsing issue. Check server logs for JSON parsing errors.`);
-                    
-            } else if (errorCode === 'AUTH_ERROR' || 
-                       errorMessage.toLowerCase().includes('invalid authentication')) {
-                
-                if (authKeyValue === 'push16') {
-                    showAlert('warning', '🔐 Authentication Issue', 
-                        'Auth key is correct but server validation failed. Check server-side validation logic.');
+                if (result.success === true && result.error !== true) {
+                    showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
+                    form.reset();
+                    fields.forEach(field => {
+                        field.classList.remove('success', 'error');
+                    });
                 } else {
-                    showAlert('error', '🔐 Invalid Authentication Key', 
-                        'The authentication key you entered is incorrect. Please check and try again.');
+                    const errorMessage = result.message || 'Unknown error occurred';
+                    const errorCode = result.code || '';
+                    if (errorMessage.includes('Authentication key is required')) {
+                        showAlert('error', '🔐 Server Auth Key Issue', 
+                            `Server reports "Authentication key is required" but we sent "${authKeyValue}". This suggests a server-side parsing issue. Check server logs for JSON parsing errors.`);
+                    } else if (errorCode === 'AUTH_ERROR' || 
+                               errorMessage.toLowerCase().includes('invalid authentication')) {
+                        if (authKeyValue === 'push16') {
+                            showAlert('warning', '🔐 Authentication Issue', 
+                                'Auth key is correct but server validation failed. Check server-side validation logic.');
+                        } else {
+                            showAlert('error', '🔐 Invalid Authentication Key', 
+                                'The authentication key you entered is incorrect. Please check and try again.');
+                        }
+                        form.authKey.focus();
+                        form.authKey.select();
+                    } else if (errorCode === 'VALIDATION_ERROR' || 
+                               errorMessage.toLowerCase().includes('missing required fields')) {
+                        showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
+                    } else {
+                        showAlert('error', 'Push Failed', errorMessage);
+                    }
                 }
-                form.authKey.focus();
-                form.authKey.select();
-                
-            } else if (errorCode === 'VALIDATION_ERROR' || 
-                       errorMessage.toLowerCase().includes('missing required fields')) {
-                showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
-                
-            } else {
-                showAlert('error', 'Push Failed', errorMessage);
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showAlert('error', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+                } else if (error.name === 'SyntaxError') {
+                    showAlert('warning', '⚠️ Response Format Error', 'Server returned invalid response format. The request may have been processed incorrectly.');
+                } else {
+                    showAlert('error', 'Unexpected Error', 'An unexpected error occurred: ' + error.message);
+                }
+            } finally {
+                submitBtn.disabled = false;
+                form.classList.remove('form-loading');
+                btnText.textContent = 'Push to GitHub';
+                loading.style.display = 'none';
             }
-        }
-
-    } catch (error) {
-        console.error('Network/Parse error:', error);
-        
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            showAlert('error', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
-        } else if (error.name === 'SyntaxError') {
-            showAlert('warning', '⚠️ Response Format Error', 'Server returned invalid response format. The request may have been processed incorrectly.');
-        } else {
-            showAlert('error', 'Unexpected Error', 'An unexpected error occurred: ' + error.message);
-        }
-    } finally {
-        submitBtn.disabled = false;
-        form.classList.remove('form-loading');
-        btnText.textContent = 'Push to GitHub';
-        loading.style.display = 'none';
-    }
-});
+        });
 
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
-    if (e.target.id === 'alertOverlay') {
-        e.target.classList.add('hide');
-        setTimeout(() => {
-            e.target.classList.remove('show', 'hide');
-        }, 300);
-    }
-});
+            if (e.target.id === 'alertOverlay') {
+                e.target.classList.add('hide');
+                setTimeout(() => {
+                    e.target.classList.remove('show', 'hide');
+                }, 300);
+            }
+        });
 
-// Update escape key handler
-document.addEventListener('keydown', (e) => {
-    const overlay = document.getElementById('alertOverlay');
-    if (e.key === 'Escape' && overlay.classList.contains('show')) {
-        overlay.classList.add('hide');
-        setTimeout(() => {
-            overlay.classList.remove('show', 'hide');
-        }, 300);
-    }
-});
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('alertOverlay');
+            if (e.key === 'Escape' && overlay.classList.contains('show')) {
+                overlay.classList.add('hide');
+                setTimeout(() => {
+                    overlay.classList.remove('show', 'hide');
+                }, 300);
+            }
+        });
     </script>
 </body>
 </html>
