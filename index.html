@@ -443,25 +443,24 @@
         <form id="pushForm">
             <input type="text" name="username" id="username" autocomplete="username" style="display: none;" />
             <div class="form-group">
-    <label for="authKey">Authentication Key</label>
-    <div class="input-wrapper">
-        <input 
-            type="password"
-            id="authKey"
-            name="authKey"
-            class="form-control"
-            placeholder="Enter your secret key"
-            value=""
-            required
-            autocomplete="current-password"
-        />
-        <div class="error-message">Please enter a valid authentication key</div>
-    </div>
-</div>
+                <label for="authKey">Authentication Key</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password"
+                        id="authKey"
+                        name="authKey"
+                        class="form-control"
+                        placeholder="Enter your secret key"
+                        value=""
+                        required
+                        autocomplete="current-password"
+                    />
+                    <div class="error-message">Please enter a valid authentication key</div>
+                </div>
+            </div>
             <div class="form-group">
                 <label for="user">GitHub Username</label>
                 <div class="input-wrapper">
-                    
                     <input type="text" id="user" name="user" class="form-control" placeholder="Enter your GitHub username" required pattern="[a-zA-Z0-9_\-]+" />
                     <div class="error-message">Please enter a valid GitHub username</div>
                 </div>
@@ -576,6 +575,42 @@
             });
         });
 
+        // Error message detection function
+        function getErrorType(errorMessage) {
+            const lowerMsg = errorMessage.toLowerCase();
+            
+            // Check for authentication errors
+            if (lowerMsg.includes('unauthorized') || 
+                lowerMsg.includes('invalid auth key') || 
+                lowerMsg.includes('authentication failed') ||
+                lowerMsg.includes('❌ unauthorized')) {
+                return 'auth';
+            }
+            
+            // Check for repository errors
+            if (lowerMsg.includes('repository not found') || 
+                lowerMsg.includes('repo does not exist') ||
+                lowerMsg.includes('404')) {
+                return 'repo';
+            }
+            
+            // Check for permission errors
+            if (lowerMsg.includes('permission denied') || 
+                lowerMsg.includes('403') ||
+                lowerMsg.includes('access denied')) {
+                return 'permission';
+            }
+            
+            // Check for network errors
+            if (lowerMsg.includes('network') || 
+                lowerMsg.includes('connection') ||
+                lowerMsg.includes('timeout')) {
+                return 'network';
+            }
+            
+            return 'general';
+        }
+
         // Form submission
         document.getElementById('pushForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -606,47 +641,86 @@
             btnText.textContent = 'Pushing...';
             loading.style.display = 'block';
 
-           try {
-  const body = {
-    user: form.user.value.trim(),
-    repo: form.repo.value.trim(),
-    message: form.message.value.trim(),
-    authKey: form.authKey.value.trim(),
-    files: [
-      {
-        name: form.fileName.value.trim(),
-        content: form.fileContent.value
-      }
-    ]
-  };
+            try {
+                const body = {
+                    user: form.user.value.trim(),
+                    repo: form.repo.value.trim(),
+                    message: form.message.value.trim(),
+                    authKey: form.authKey.value.trim(),
+                    files: [
+                        {
+                            name: form.fileName.value.trim(),
+                            content: form.fileContent.value
+                        }
+                    ]
+                };
 
-  const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+                const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
 
-  const result = await res.json();
+                const result = await res.json();
 
-  if (res.ok && !result.error) {
-    showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
-    form.reset();
-    fields.forEach(field => {
-      field.classList.remove('success', 'error');
-    });
-  } else {
-    showAlert('error', 'Push Failed', result.message || 'An unexpected error occurred while pushing to GitHub. Please check your credentials and try again.');
-  }
+                if (res.ok && !result.error) {
+                    showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
+                    form.reset();
+                    fields.forEach(field => {
+                        field.classList.remove('success', 'error');
+                    });
+                } else {
+                    // Enhanced error handling based on error type
+                    const errorMessage = result.message || 'Unknown error occurred';
+                    const errorType = getErrorType(errorMessage);
+                    
+                    let title = 'Push Failed';
+                    let message = errorMessage;
+                    let alertType = 'error';
 
-} catch (error) {
-  console.error('Network error:', error);
-  showAlert('warning', 'Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
-} finally {
-  submitBtn.disabled = false;
-  form.classList.remove('form-loading');
-  btnText.textContent = 'Push to GitHub';
-  loading.style.display = 'none';
-}
+                    switch (errorType) {
+                        case 'auth':
+                            title = '🔐 Authentication Failed';
+                            message = 'Invalid authentication key. Please check your secret key and try again.';
+                            alertType = 'warning';
+                            // Clear the auth key field for security
+                            form.authKey.value = '';
+                            form.authKey.focus();
+                            break;
+                            
+                        case 'repo':
+                            title = '📁 Repository Not Found';
+                            message = 'The specified repository does not exist or is not accessible. Please check the username and repository name.';
+                            break;
+                            
+                        case 'permission':
+                            title = '🚫 Permission Denied';
+                            message = 'You do not have permission to push to this repository. Check your GitHub access rights.';
+                            break;
+                            
+                        case 'network':
+                            title = '🌐 Connection Error';
+                            message = 'Unable to connect to GitHub. Please check your internet connection and try again.';
+                            alertType = 'warning';
+                            break;
+                            
+                        default:
+                            title = 'Push Failed';
+                            message = errorMessage || 'An unexpected error occurred while pushing to GitHub. Please try again.';
+                    }
+
+                    showAlert(alertType, title, message);
+                }
+
+            } catch (error) {
+                console.error('Network error:', error);
+                showAlert('warning', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+            } finally {
+                submitBtn.disabled = false;
+                form.classList.remove('form-loading');
+                btnText.textContent = 'Push to GitHub';
+                loading.style.display = 'none';
+            }
         });
 
         // Close modal when clicking outside
