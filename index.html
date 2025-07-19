@@ -441,7 +441,9 @@
         </div>
 
         <form id="pushForm">
-            <input type="text" name="username" id="username" autocomplete="username" style="display: none;" />
+          <form id="pushForm">
+            <!-- Removed hidden username field yang bisa trigger autofill -->
+            
             <div class="form-group">
                 <label for="authKey">Authentication Key</label>
                 <div class="input-wrapper">
@@ -453,51 +455,99 @@
                         placeholder="Enter your secret key"
                         value=""
                         required
-                        autocomplete="current-password"
+                        autocomplete="new-password"
+                        data-lpignore="true"
+                        spellcheck="false"
                     />
                     <div class="error-message">Please enter a valid authentication key</div>
                 </div>
             </div>
+            
             <div class="form-group">
                 <label for="user">GitHub Username</label>
                 <div class="input-wrapper">
-                    <input type="text" id="user" name="user" class="form-control" placeholder="Enter your GitHub username" required pattern="[a-zA-Z0-9_\-]+" />
+                    <input 
+                        type="text" 
+                        id="user" 
+                        name="user" 
+                        class="form-control" 
+                        placeholder="Enter your GitHub username" 
+                        required 
+                        pattern="[a-zA-Z0-9_\-]+"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
                     <div class="error-message">Please enter a valid GitHub username</div>
                 </div>
             </div>
-
+            
             <div class="form-group">
                 <label for="repo">Repository Name</label>
                 <div class="input-wrapper">
-                  <input type="text" id="repo" name="repo" class="form-control" placeholder="Enter repository name" required pattern="[a-zA-Z0-9_.\-]+" />
+                    <input 
+                        type="text" 
+                        id="repo" 
+                        name="repo" 
+                        class="form-control" 
+                        placeholder="Enter repository name" 
+                        required 
+                        pattern="[a-zA-Z0-9_.\-]+"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
                     <div class="error-message">Please enter a valid repository name</div>
                 </div>
             </div>
-
+            
             <div class="form-group">
                 <label for="message">Commit Message</label>
                 <div class="input-wrapper">
-                    <input type="text" id="message" name="message" class="form-control" placeholder="Describe your changes (e.g., 'Add new feature')" required />
+                    <input 
+                        type="text" 
+                        id="message" 
+                        name="message" 
+                        class="form-control" 
+                        placeholder="Describe your changes (e.g., 'Add new feature')" 
+                        required
+                        autocomplete="off"
+                    />
                     <div class="error-message">Please enter a commit message</div>
                 </div>
             </div>
-
+            
             <div class="form-group">
                 <label for="fileContent">File Content</label>
                 <div class="input-wrapper">
-                    <textarea id="fileContent" name="fileContent" class="form-control" placeholder="Paste your code here..." required></textarea>
+                    <textarea 
+                        id="fileContent" 
+                        name="fileContent" 
+                        class="form-control" 
+                        placeholder="Paste your code here..." 
+                        required
+                        autocomplete="off"
+                        spellcheck="false"
+                    ></textarea>
                     <div class="error-message">Please enter the file content</div>
                 </div>
             </div>
-
+            
             <div class="form-group">
                 <label for="fileName">File Name</label>
                 <div class="input-wrapper">
-                    <input type="text" id="fileName" name="fileName" class="form-control" placeholder="e.g., index.js, README.md, style.css" required />
+                    <input 
+                        type="text" 
+                        id="fileName" 
+                        name="fileName" 
+                        class="form-control" 
+                        placeholder="e.g., index.js, README.md, style.css" 
+                        required
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
                     <div class="error-message">Please enter a valid file name</div>
                 </div>
             </div>
-
+            
             <button type="submit" class="submit-btn">
                 <div class="btn-content">
                     <span class="btn-text">Push to GitHub</span>
@@ -611,151 +661,207 @@
             return 'general';
         }
 
+        // Debug function untuk melihat nilai auth key
+        function updateDebugInfo() {
+            const authKeyField = document.getElementById('authKey');
+            const debugDiv = document.getElementById('debugInfo');
+            const debugContent = document.getElementById('debugContent');
+            
+            if (authKeyField.value) {
+                const value = authKeyField.value;
+                debugContent.innerHTML = `
+                    Raw: "${value}"<br>
+                    Length: ${value.length}<br>
+                    Trimmed: "${value.trim()}"<br>
+                    Trimmed Length: ${value.trim().length}<br>
+                    Char Codes: [${Array.from(value.trim()).map(c => c.charCodeAt(0)).join(', ')}]<br>
+                    Expected: "push16" (Length: 6, Codes: [112, 117, 115, 104, 49, 54])
+                `;
+                debugDiv.style.display = 'block';
+            } else {
+                debugDiv.style.display = 'none';
+            }
+        }
+
+        // Add event listener untuk debugging
+        document.getElementById('authKey').addEventListener('input', updateDebugInfo);
+        document.getElementById('authKey').addEventListener('paste', () => {
+            setTimeout(updateDebugInfo, 10); // Small delay untuk paste event
+        });
+
+        // Validasi field function
+        function validateField(field) {
+            const value = field.value.trim();
+            if (!value) {
+                field.classList.add('error');
+                return false;
+            }
+            field.classList.remove('error');
+            return true;
+        }
+
+        // Alert function (placeholder - ganti dengan implementasi Anda)
+        function showAlert(type, title, message) {
+            alert(`${title}: ${message}`);
+        }
+
         // Form submission dengan debugging yang lebih detail
-document.getElementById('pushForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+        document.getElementById('pushForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    const form = e.target;
-    const submitBtn = form.querySelector('.submit-btn');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const loading = submitBtn.querySelector('.loading-spinner');
+            const form = e.target;
+            const submitBtn = form.querySelector('.submit-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const loading = submitBtn.querySelector('.loading-spinner');
 
-    // Validate all fields
-    const fields = form.querySelectorAll('.form-control');
-    let isFormValid = true;
+            // Validate all fields
+            const fields = form.querySelectorAll('.form-control');
+            let isFormValid = true;
 
-    fields.forEach(field => {
-        if (!validateField(field)) {
-            isFormValid = false;
-        }
-    });
-
-    if (!isFormValid) {
-        showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
-        return;
-    }
-
-    // Start loading state
-    submitBtn.disabled = true;
-    form.classList.add('form-loading');
-    btnText.textContent = 'Pushing...';
-    loading.style.display = 'block';
-
-    try {
-        const body = {
-            user: form.user.value.trim(),
-            repo: form.repo.value.trim(),
-            message: form.message.value.trim(),
-            authKey: form.authKey.value.trim(),
-            files: [
-                {
-                    name: form.fileName.value.trim(),
-                    content: form.fileContent.value
-                }
-            ]
-        };
-
-        // Debug log
-        console.log('Sending request with body:', {
-            ...body,
-            authKey: '***' // Hide auth key in log
-        });
-
-        const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(body)
-        });
-
-        console.log('Response status:', res.status);
-        console.log('Response headers:', Object.fromEntries(res.headers.entries()));
-
-        let result;
-        const contentType = res.headers.get('content-type');
-        
-        if (contentType && contentType.includes('application/json')) {
-            result = await res.json();
-        } else {
-            const textResult = await res.text();
-            console.log('Non-JSON response:', textResult);
-            
-            // Try to extract meaningful info from text response
-            if (textResult.includes('Workflow was started')) {
-                result = {
-                    success: false,
-                    error: true,
-                    message: 'Workflow started but no proper response received. This usually indicates an error in the workflow execution.'
-                };
-            } else {
-                result = {
-                    success: false,
-                    error: true,
-                    message: 'Invalid response format from server: ' + textResult
-                };
-            }
-        }
-
-        console.log('Parsed result:', result);
-
-        // Handle success
-        if (result.success === true && !result.error) {
-            showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
-            form.reset();
             fields.forEach(field => {
-                field.classList.remove('success', 'error');
+                if (!validateField(field)) {
+                    isFormValid = false;
+                }
             });
-        } else {
-            // Handle errors with detailed messages
-            const errorMessage = result.message || 'Unknown error occurred';
-            
-            console.log('Error detected:', errorMessage);
-            
-            // Check for specific error types
-            if (errorMessage.includes('Invalid authentication key') || 
-                errorMessage.includes('Unauthorized') ||
-                result.code === 'AUTH_ERROR') {
-                
-                showAlert('warning', '🔐 Authentication Failed', 'Invalid authentication key. Please check your secret key and try again.');
-                form.authKey.value = '';
-                form.authKey.focus();
-                
-            } else if (errorMessage.includes('Missing required fields') || 
-                       result.code === 'VALIDATION_ERROR') {
-                       
-                showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
-                
-            } else if (errorMessage.includes('Repository not found') || 
-                       errorMessage.includes('404')) {
-                       
-                showAlert('error', '📁 Repository Not Found', 'The specified repository does not exist or is not accessible.');
-                
-            } else if (errorMessage.includes('Permission denied') || 
-                       errorMessage.includes('403')) {
-                       
-                showAlert('error', '🚫 Permission Denied', 'You do not have permission to push to this repository.');
-                
-            } else if (errorMessage.includes('Workflow started but no proper response')) {
-                
-                showAlert('warning', '⚠️ Workflow Issue', 'The workflow started but encountered an issue. Please check your inputs and try again.');
-                
-            } else {
-                showAlert('error', 'Push Failed', errorMessage);
-            }
-        }
 
-    } catch (error) {
-        console.error('Network/Parse error:', error);
-        showAlert('warning', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
-    } finally {
-        submitBtn.disabled = false;
-        form.classList.remove('form-loading');
-        btnText.textContent = 'Push to GitHub';
-        loading.style.display = 'none';
-    }
-});
+            if (!isFormValid) {
+                showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
+                return;
+            }
+
+            // Start loading state
+            submitBtn.disabled = true;
+            form.classList.add('form-loading');
+            btnText.textContent = 'Pushing...';
+            loading.style.display = 'block';
+
+            try {
+                // Pastikan tidak ada whitespace atau karakter tersembunyi
+                const authKeyValue = form.authKey.value.replace(/[\r\n\t\u00A0]/g, '').trim();
+                
+                const body = {
+                    user: form.user.value.trim(),
+                    repo: form.repo.value.trim(),
+                    message: form.message.value.trim(),
+                    authKey: authKeyValue, // Menggunakan nilai yang sudah dibersihkan
+                    files: [
+                        {
+                            name: form.fileName.value.trim(),
+                            content: form.fileContent.value
+                        }
+                    ]
+                };
+
+                // Enhanced debug log
+                console.log('=== SENDING REQUEST DEBUG ===');
+                console.log('Auth key details:');
+                console.log('- Original value:', JSON.stringify(form.authKey.value));
+                console.log('- Cleaned value:', JSON.stringify(authKeyValue));
+                console.log('- Length:', authKeyValue.length);
+                console.log('- Character codes:', Array.from(authKeyValue).map(c => c.charCodeAt(0)));
+                console.log('- Expected: push16 (codes: [112, 117, 115, 104, 49, 54])');
+                console.log('==============================');
+
+                console.log('Sending request with body:', {
+                    ...body,
+                    authKey: '***' // Hide auth key in log
+                });
+
+                const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                console.log('Response status:', res.status);
+                console.log('Response headers:', Object.fromEntries(res.headers.entries()));
+
+                let result;
+                const contentType = res.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    result = await res.json();
+                } else {
+                    const textResult = await res.text();
+                    console.log('Non-JSON response:', textResult);
+                    
+                    if (textResult.includes('Workflow was started')) {
+                        result = {
+                            success: false,
+                            error: true,
+                            message: 'Workflow started but no proper response received. This usually indicates an error in the workflow execution.'
+                        };
+                    } else {
+                        result = {
+                            success: false,
+                            error: true,
+                            message: 'Invalid response format from server: ' + textResult
+                        };
+                    }
+                }
+
+                console.log('Parsed result:', result);
+
+                // Handle success
+                if (result.success === true && !result.error) {
+                    showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
+                    form.reset();
+                    updateDebugInfo(); // Update debug info after reset
+                    fields.forEach(field => {
+                        field.classList.remove('success', 'error');
+                    });
+                } else {
+                    // Handle errors with detailed messages
+                    const errorMessage = result.message || 'Unknown error occurred';
+                    
+                    console.log('Error detected:', errorMessage);
+                    
+                    if (errorMessage.includes('Invalid authentication key') || 
+                        errorMessage.includes('Unauthorized') ||
+                        result.code === 'AUTH_ERROR') {
+                        
+                        showAlert('warning', '🔐 Authentication Failed', `Auth error: ${errorMessage}. Check debug info above.`);
+                        form.authKey.value = '';
+                        form.authKey.focus();
+                        updateDebugInfo();
+                        
+                    } else if (errorMessage.includes('Missing required fields') || 
+                               result.code === 'VALIDATION_ERROR') {
+                               
+                        showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
+                        
+                    } else if (errorMessage.includes('Repository not found') || 
+                               errorMessage.includes('404')) {
+                               
+                        showAlert('error', '📁 Repository Not Found', 'The specified repository does not exist or is not accessible.');
+                        
+                    } else if (errorMessage.includes('Permission denied') || 
+                               errorMessage.includes('403')) {
+                               
+                        showAlert('error', '🚫 Permission Denied', 'You do not have permission to push to this repository.');
+                        
+                    } else if (errorMessage.includes('Workflow started but no proper response')) {
+                        
+                        showAlert('warning', '⚠️ Workflow Issue', 'The workflow started but encountered an issue. Please check your inputs and try again.');
+                        
+                    } else {
+                        showAlert('error', 'Push Failed', errorMessage);
+                    }
+                }
+
+            } catch (error) {
+                console.error('Network/Parse error:', error);
+                showAlert('warning', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+            } finally {
+                submitBtn.disabled = false;
+                form.classList.remove('form-loading');
+                btnText.textContent = 'Push to GitHub';
+                loading.style.display = 'none';
+            }
+        });
 
         // Close modal when clicking outside
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
