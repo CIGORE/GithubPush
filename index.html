@@ -628,7 +628,8 @@
 
                 const result = await res.json();
 
-              if (res.ok && !result.error) {
+              if (res.ok) {
+
     showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
     form.reset();
     fields.forEach(field => {
