@@ -11,179 +11,419 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --error-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --focus-color: #667eea;
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-heavy: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --border-radius: 16px;
+            --border-radius-lg: 24px;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            padding: 40px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-heavy);
+            padding: 48px;
             width: 100%;
-            max-width: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 520px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
         }
 
         .header h1 {
-            color: #2d3748;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
         .header p {
-            color: #718096;
+            color: var(--text-secondary);
             font-size: 16px;
+            font-weight: 500;
+            line-height: 1.5;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #2d3748;
+            margin-bottom: 10px;
+            color: var(--text-primary);
             font-weight: 600;
             font-size: 14px;
+            letter-spacing: 0.025em;
+        }
+
+        .input-wrapper {
+            position: relative;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: #ffffff;
-            color: #2d3748;
+            color: var(--text-primary);
+            font-weight: 500;
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
+            border-color: var(--focus-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+            background: #fafbff;
+        }
+
+        .form-control:valid {
+            border-color: #48bb78;
         }
 
         .form-control::placeholder {
             color: #a0aec0;
+            font-weight: 400;
         }
 
         textarea.form-control {
             resize: vertical;
-            min-height: 120px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            min-height: 140px;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.6;
         }
 
         .submit-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 18px;
+            background: var(--primary-gradient);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .github-icon {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        /* Custom Alert System */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
             transition: all 0.3s ease;
+        }
+
+        .alert-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .alert-modal {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-heavy);
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+        .alert-overlay.show .alert-modal {
+            transform: scale(1) translateY(0);
         }
 
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .loading::after {
-            content: '';
-            width: 20px;
-            height: 20px;
-            border: 2px solid transparent;
-            border-top: 2px solid white;
+        .alert-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: bounceIn 0.6s ease-out 0.2s both;
         }
 
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 24px;
-            border-radius: 12px;
+        .alert-icon.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .alert-icon.error {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            box-shadow: 0 8px 25px rgba(245, 101, 101, 0.4);
+        }
+
+        .alert-icon.warning {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+        }
+
+        .alert-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+
+        .alert-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .alert-message {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .alert-button {
+            background: var(--primary-gradient);
             color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
             font-weight: 600;
-            transform: translateX(400px);
+            cursor: pointer;
             transition: all 0.3s ease;
-            z-index: 1000;
-            max-width: 400px;
+            min-width: 100px;
         }
 
-        .notification.success {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        .alert-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
-        .notification.error {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        /* Form Validation Feedback */
+        .form-control.error {
+            border-color: #f56565;
+            background: #fef5f5;
         }
 
-        .notification.show {
-            transform: translateX(0);
+        .form-control.success {
+            border-color: #48bb78;
+            background: #f0fff4;
         }
 
-        .github-icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-            margin-right: 8px;
-            vertical-align: middle;
+        .error-message {
+            color: #f56565;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
         }
 
+        .form-control.error + .error-message {
+            display: block;
+        }
+
+        /* Responsive Design */
         @media (max-width: 480px) {
             .container {
-                padding: 30px 20px;
+                padding: 32px 24px;
                 margin: 10px;
             }
             
             .header h1 {
-                font-size: 24px;
+                font-size: 28px;
+            }
+
+            .alert-modal {
+                padding: 24px 20px;
+            }
+        }
+
+        /* Loading state improvements */
+        .form-loading .form-control {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Micro-interactions */
+        .form-group {
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+        .form-group:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
     </style>
@@ -197,77 +437,174 @@
                 </svg>
                 GitHub Push
             </h1>
-            <p>Deploy your code seamlessly via n8n</p>
+            <p>Deploy your code seamlessly via n8n automation</p>
         </div>
 
         <form id="pushForm">
             <div class="form-group">
+                <label for="authKey">Authentication Key</label>
+                <div class="input-wrapper">
+                    <input type="password" id="authKey" name="authKey" class="form-control" placeholder="Enter your secret authentication key" required />
+                    <div class="error-message">Please enter a valid authentication key</div>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="user">GitHub Username</label>
-                <input type="text" id="user" name="user" class="form-control" placeholder="Enter your GitHub username" required />
+                <div class="input-wrapper">
+                    <input type="text" id="user" name="user" class="form-control" placeholder="Enter your GitHub username" required pattern="[a-zA-Z0-9_-]+" />
+                    <div class="error-message">Please enter a valid GitHub username</div>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="repo">Repository Name</label>
-                <input type="text" id="repo" name="repo" class="form-control" placeholder="Enter repository name" required />
+                <div class="input-wrapper">
+                    <input type="text" id="repo" name="repo" class="form-control" placeholder="Enter repository name" required pattern="[a-zA-Z0-9_.-]+" />
+                    <div class="error-message">Please enter a valid repository name</div>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="message">Commit Message</label>
-                <input type="text" id="message" name="message" class="form-control" placeholder="Describe your changes" required />
+                <div class="input-wrapper">
+                    <input type="text" id="message" name="message" class="form-control" placeholder="Describe your changes (e.g., 'Add new feature')" required />
+                    <div class="error-message">Please enter a commit message</div>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="fileContent">File Content</label>
-                <textarea id="fileContent" name="fileContent" class="form-control" placeholder="Paste your code here..." required></textarea>
+                <div class="input-wrapper">
+                    <textarea id="fileContent" name="fileContent" class="form-control" placeholder="Paste your code here..." required></textarea>
+                    <div class="error-message">Please enter the file content</div>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="fileName">File Name</label>
-                <input type="text" id="fileName" name="fileName" class="form-control" placeholder="e.g., index.js, README.md" required />
+                <div class="input-wrapper">
+                    <input type="text" id="fileName" name="fileName" class="form-control" placeholder="e.g., index.js, README.md, style.css" required />
+                    <div class="error-message">Please enter a valid file name</div>
+                </div>
             </div>
 
             <button type="submit" class="submit-btn">
-                <span class="btn-text">Push to GitHub</span>
-                <div class="loading"></div>
+                <div class="btn-content">
+                    <span class="btn-text">Push to GitHub</span>
+                    <div class="loading-spinner"></div>
+                </div>
             </button>
         </form>
     </div>
 
-    <script>
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
+    <!-- Custom Alert Modal -->
+    <div id="alertOverlay" class="alert-overlay">
+        <div class="alert-modal">
+            <div id="alertIcon" class="alert-icon">
+                <!-- Icon will be dynamically inserted -->
+            </div>
+            <h3 id="alertTitle" class="alert-title"></h3>
+            <p id="alertMessage" class="alert-message"></p>
+            <button id="alertButton" class="alert-button">OK</button>
+        </div>
+    </div>
 
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => document.body.removeChild(notification), 300);
-            }, 4000);
+    <script>
+        // Custom Alert System
+        function showAlert(type, title, message) {
+            const overlay = document.getElementById('alertOverlay');
+            const icon = document.getElementById('alertIcon');
+            const titleEl = document.getElementById('alertTitle');
+            const messageEl = document.getElementById('alertMessage');
+            const button = document.getElementById('alertButton');
+
+            // Set icon based on type
+            const icons = {
+                success: `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+                error: `<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
+                warning: `<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
+            };
+
+            icon.className = `alert-icon ${type}`;
+            icon.innerHTML = icons[type] || icons.warning;
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            overlay.classList.add('show');
+
+            button.onclick = () => {
+                overlay.classList.remove('show');
+            };
+
+            // Auto close after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                }, 5000);
+            }
         }
 
+        // Form validation
+        function validateField(field) {
+            const value = field.value.trim();
+            const isValid = field.checkValidity() && value.length > 0;
+            
+            field.classList.toggle('error', !isValid);
+            field.classList.toggle('success', isValid);
+            
+            return isValid;
+        }
+
+        // Add real-time validation
+        document.querySelectorAll('.form-control').forEach(field => {
+            field.addEventListener('blur', () => validateField(field));
+            field.addEventListener('input', () => {
+                if (field.classList.contains('error')) {
+                    validateField(field);
+                }
+            });
+        });
+
+        // Form submission
         document.getElementById('pushForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const form = e.target;
             const submitBtn = form.querySelector('.submit-btn');
             const btnText = submitBtn.querySelector('.btn-text');
-            const loading = submitBtn.querySelector('.loading');
-            
-            // Show loading state
+            const loading = submitBtn.querySelector('.loading-spinner');
+
+            // Validate all fields
+            const fields = form.querySelectorAll('.form-control');
+            let isFormValid = true;
+
+            fields.forEach(field => {
+                if (!validateField(field)) {
+                    isFormValid = false;
+                }
+            });
+
+            if (!isFormValid) {
+                showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
+                return;
+            }
+
+            // Start loading state
             submitBtn.disabled = true;
-            btnText.style.opacity = '0';
+            form.classList.add('form-loading');
+            btnText.textContent = 'Pushing...';
             loading.style.display = 'block';
-            
+
             try {
                 const body = {
-                    user: form.user.value,
-                    repo: form.repo.value,
-                    message: form.message.value,
+                    user: form.user.value.trim(),
+                    repo: form.repo.value.trim(),
+                    message: form.message.value.trim(),
+                    auth: form.authKey.value.trim(),
                     files: [
                         {
-                            name: form.fileName.value,
+                            name: form.fileName.value.trim(),
                             content: form.fileContent.value
                         }
                     ]
@@ -280,32 +617,41 @@
                 });
 
                 const result = await res.json();
-                
+
                 if (res.ok) {
-                    showNotification('Successfully pushed to GitHub! 🎉', 'success');
+                    showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
                     form.reset();
+                    // Remove validation classes
+                    fields.forEach(field => {
+                        field.classList.remove('success', 'error');
+                    });
                 } else {
-                    showNotification('Push failed: ' + (result.message || 'Unknown error'), 'error');
+                    showAlert('error', 'Push Failed', result.message || 'An unexpected error occurred while pushing to GitHub. Please check your credentials and try again.');
                 }
             } catch (error) {
-                showNotification('Network error: ' + error.message, 'error');
+                console.error('Network error:', error);
+                showAlert('warning', 'Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
             } finally {
-                // Reset button state
+                // Reset loading state
                 submitBtn.disabled = false;
-                btnText.style.opacity = '1';
+                form.classList.remove('form-loading');
+                btnText.textContent = 'Push to GitHub';
                 loading.style.display = 'none';
             }
         });
 
-        // Add smooth focus transitions
-        document.querySelectorAll('.form-control').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'translateY(-2px)';
-            });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'translateY(0)';
-            });
+        // Close modal when clicking outside
+        document.getElementById('alertOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'alertOverlay') {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('alertOverlay').classList.remove('show');
+            }
         });
     </script>
 </body>
