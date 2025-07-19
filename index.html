@@ -663,14 +663,15 @@
 
                 const result = await res.json();
 
-                if (res.ok && !result.error) {
+                // Check if the workflow executed successfully
+                if (res.ok && result.success === true) {
                     showAlert('success', 'Push Successful!', 'Your code has been successfully pushed to GitHub. Check your repository to see the changes.');
                     form.reset();
                     fields.forEach(field => {
                         field.classList.remove('success', 'error');
                     });
                 } else {
-                    // Enhanced error handling based on error type
+                    // Handle different error types
                     const errorMessage = result.message || 'Unknown error occurred';
                     const errorType = getErrorType(errorMessage);
                     
