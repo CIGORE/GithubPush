@@ -549,117 +549,62 @@
                 </svg>
                 GitHub Push
             </h1>
-            <p>Deploy your code seamlessly via n8n automation</p>
+            <p>Edit satu baris file di GitHub via n8n automation</p>
         </div>
 
         <form id="pushForm">
-            <input type="text" 
-                name="username" 
-                autocomplete="username" 
-                style="display: none;" 
-                tabindex="-1" 
-                aria-hidden="true">
-            <div class="form-group">
-                <label for="authKey">Authentication Key</label>
-                <div class="input-wrapper">
-                    <input 
-                        type="password"
-                        id="authKey"
-                        name="authKey"
-                        class="form-control"
-                        placeholder="Enter your secret key"
-                        value=""
-                        required
-                        autocomplete="new-password"
-                        data-lpignore="true"
-                        spellcheck="false"
-                    />
-                    <div class="error-message">Please enter a valid authentication key</div>
-                </div>
-            </div>
             <div class="form-group">
                 <label for="user">GitHub Username</label>
                 <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="user" 
-                        name="user" 
-                        class="form-control" 
-                        placeholder="Enter your GitHub username" 
-                        required 
-                        pattern="[a-zA-Z0-9_\-]+"
-                        autocomplete="off"
-                        spellcheck="false"
-                    />
+                    <input type="text" id="user" name="user" class="form-control" placeholder="Your GitHub username" required autocomplete="off" />
                     <div class="error-message">Please enter a valid GitHub username</div>
                 </div>
             </div>
             <div class="form-group">
                 <label for="repo">Repository Name</label>
                 <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="repo" 
-                        name="repo" 
-                        class="form-control" 
-                        placeholder="Enter repository name" 
-                        required 
-                        pattern="[a-zA-Z0-9_.\-]+"
-                        autocomplete="off"
-                        spellcheck="false"
-                    />
+                    <input type="text" id="repo" name="repo" class="form-control" placeholder="Repository name" required autocomplete="off" />
                     <div class="error-message">Please enter a valid repository name</div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="message">Commit Message</label>
-                <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="message" 
-                        name="message" 
-                        class="form-control" 
-                        placeholder="Describe your changes (e.g., 'Add new feature')" 
-                        required
-                        autocomplete="off"
-                    />
-                    <div class="error-message">Please enter a commit message</div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="fileContent">File Content</label>
-                <div class="input-wrapper">
-                    <textarea 
-                        id="fileContent" 
-                        name="fileContent" 
-                        class="form-control" 
-                        placeholder="Paste your code here..." 
-                        required
-                        autocomplete="off"
-                        spellcheck="false"
-                    ></textarea>
-                    <div class="error-message">Please enter the file content</div>
                 </div>
             </div>
             <div class="form-group">
                 <label for="fileName">File Name</label>
                 <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="fileName" 
-                        name="fileName" 
-                        class="form-control" 
-                        placeholder="e.g., index.js, README.md, style.css" 
-                        required
-                        autocomplete="off"
-                        spellcheck="false"
-                    />
+                    <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html, README.md, dll" required autocomplete="off" />
                     <div class="error-message">Please enter a valid file name</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="findLine">Cari Baris (Case Sensitive!)</label>
+                <div class="input-wrapper">
+                    <input type="text" id="findLine" name="findLine" class="form-control" placeholder="Misal: <title>Test Web</title>" required autocomplete="off" />
+                    <div class="error-message">Isi baris yang mau diganti</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="replaceLine">Ganti Dengan</label>
+                <div class="input-wrapper">
+                    <input type="text" id="replaceLine" name="replaceLine" class="form-control" placeholder="Misal: <title>Judul Baru</title>" required autocomplete="off" />
+                    <div class="error-message">Isi baris pengganti</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="message">Commit Message</label>
+                <div class="input-wrapper">
+                    <input type="text" id="message" name="message" class="form-control" placeholder="Deskripsi perubahan" required autocomplete="off" />
+                    <div class="error-message">Tulis pesan commit</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="token">GitHub Token (Personal Access Token, repo scope)</label>
+                <div class="input-wrapper">
+                    <input type="password" id="token" name="token" class="form-control" placeholder="Github PAT" required autocomplete="off" />
+                    <div class="error-message">Masukkan token GitHub</div>
                 </div>
             </div>
             <button type="submit" class="submit-btn">
                 <div class="btn-content">
-                    <span class="btn-text">Push to GitHub</span>
+                    <span class="btn-text">Replace & Commit</span>
                     <div class="loading-spinner"></div>
                 </div>
             </button>
@@ -740,81 +685,34 @@
             });
         });
 
-        document.getElementById('pushForm').addEventListener('submit', async (e) => {
+       document.getElementById('pushForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
-            const submitBtn = form.querySelector('.submit-btn');
-            const btnText = submitBtn.querySelector('.btn-text');
-            const loading = submitBtn.querySelector('.loading-spinner');
-            const fields = form.querySelectorAll('.form-control');
-            let isFormValid = true;
-            fields.forEach(field => {
-                if (!validateField(field)) {
-                    isFormValid = false;
-                }
+            // validasi...
+            const req = {
+                user: form.user.value.trim(),
+                repo: form.repo.value.trim(),
+                fileName: form.fileName.value.trim(),
+                findLine: form.findLine.value,
+                replaceLine: form.replaceLine.value,
+                message: form.message.value.trim(),
+                token: form.token.value.trim(),
+            };
+            
+            const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(req)
             });
-            if (!isFormValid) {
-                showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
-                return;
+            const result = await res.json();
+            // alert sukses/gagal
+            if(result.success){
+                showAlert('success', 'Push Success', result.message || 'Baris berhasil diubah & commit!');
+            } else {
+                showAlert('error', 'Push Failed', result.message || 'Gagal replace baris!');
             }
-            submitBtn.disabled = true;
-            form.classList.add('form-loading');
-            btnText.textContent = 'Pushing...';
-            loading.style.display = 'block';
-            try {
-                const rawAuthKey = form.authKey.value;
-                const authKeyValue = rawAuthKey
-                    .replace(/[\r\n\t\u00A0\u200B\u200C\u200D\uFEFF]/g, '')
-                    .trim();
-                const requestBody = {
-                    user: form.user.value.trim(),
-                    repo: form.repo.value.trim(),
-                    message: form.message.value.trim(),
-                    authKey: authKeyValue,
-                    files: [
-                        {
-                            name: form.fileName.value.trim(),
-                            content: form.fileContent.value
-                        }
-                    ]
-                };
-                const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                let result;
-                const contentType = res.headers.get('content-type');
-                const contentLength = res.headers.get('content-length');
-                if (contentLength === '0' || contentLength === 0) {
-                    result = {
-                        success: true,
-                        error: false,
-                        message: 'Push completed successfully! (Empty response from server indicates success)'
-                    };
-                } else if (contentType && contentType.includes('application/json')) {
-                    try {
-                        const responseText = await res.text();
-                        if (responseText.trim() === '') {
-                            result = {
-                                success: true,
-                                error: false,
-                                message: 'Push completed successfully! (Empty JSON response)'
-                            };
-                        } else {
-                            result = JSON.parse(responseText);
-                        }
-                    } catch (parseError) {
-                        result = {
-                            success: false,
-                            error: true,
-                            message: 'Server returned invalid JSON response. The workflow may have started but response was malformed.',
-                            code: 'PARSE_ERROR'
-                        };
-                    }
+        });
+        
                 } else {
                     const textResult = await res.text();
                     if (textResult.toLowerCase().includes('invalid authentication') || 
