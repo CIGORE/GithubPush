@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --error-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --focus-color: #667eea;
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-heavy: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --border-radius: 16px;
+            --border-radius-lg: 24px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-heavy);
+            padding: 48px;
+            width: 100%;
+            max-width: 520px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.025em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--focus-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+            background: #fafbff;
+        }
+
+        .form-control:valid {
+            border-color: #48bb78;
+        }
+
+        .form-control::placeholder {
+            color: #a0aec0;
+            font-weight: 400;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 140px;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .github-icon {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        /* Custom Alert System */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .alert-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .alert-modal {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-heavy);
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-overlay.show .alert-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .alert-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: bounceIn 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .alert-icon.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .alert-icon.error {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            box-shadow: 0 8px 25px rgba(245, 101, 101, 0.4);
+        }
+
+        .alert-icon.warning {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+        }
+
+        .alert-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+
+        .alert-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .alert-message {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .alert-button {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .alert-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Form Validation Feedback */
+        .form-control.error {
+            border-color: #f56565;
+            background: #fef5f5;
+        }
+
+        .form-control.success {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .error-message {
+            color: #f56565;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .form-control.error + .error-message {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 32px 24px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .alert-modal {
+                padding: 24px 20px;
+            }
+        }
+
+        /* Loading state improvements */
+        .form-loading .form-control {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Micro-interactions */
+        .form-group {
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+        .form-group:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }@keyframes alertSlideIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.7) translateY(-50px) rotateX(20deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05) translateY(-10px) rotateX(-5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotateX(0deg);
+    }
+}
+
+@keyframes alertSlideOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-30px);
+    }
+}
+
+.alert-modal {
+    /* Update animasi yang ada */
+    animation: alertSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.alert-overlay.hide .alert-modal {
+    animation: alertSlideOut 0.3s ease-in-out;
+}
+
+/* Icon pulse animation */
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.alert-icon {
+    animation: bounceIn 0.6s ease-out 0.2s both, iconPulse 2s infinite 1s;
+}
+
+/* Success sparkle effect */
+.alert-icon.success::after {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 20px;
+    animation: sparkle 1.5s infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: rotate(0deg) scale(0.5); }
+    50% { opacity: 1; transform: rotate(180deg) scale(1.2); }
+}
+
+/* Error shake effect */
+.alert-icon.error {
+    animation: bounceIn 0.6s ease-out 0.2s both, shake 0.5s ease-in-out 0.8s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Warning glow effect */
+.alert-icon.warning {
+    animation: bounceIn 0.6s ease-out 0.2s both, glow 2s infinite 1s;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4); }
+    50% { box-shadow: 0 8px 35px rgba(237, 137, 54, 0.7), 0 0 30px rgba(237, 137, 54, 0.3); }
+}
+
+/* Enhanced button hover */
+.alert-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease;
+}
+
+.alert-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Different alert types styling */
+.alert-title.success { color: #38a169; }
+.alert-title.error { color: #e53e3e; }
+.alert-title.warning { color: #dd6b20; }
+
+.alert-message.success { color: #2f855a; }
+.alert-message.error { color: #c53030; }
+.alert-message.warning { color: #c05621; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <svg class="github-icon" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub Push
+            </h1>
+            <p>Deploy your code seamlessly via n8n automation</p>
+        </div>
+
+        <form id="pushForm">
+            <input type="text" 
+                name="username" 
+                autocomplete="username" 
+                style="display: none;" 
+                tabindex="-1" 
+                aria-hidden="true">
+            <div class="form-group">
+                <label for="authKey">Authentication Key</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password"
+                        id="authKey"
+                        name="authKey"
+                        class="form-control"
+                        placeholder="Enter your secret key"
+                        value=""
+                        required
+                        autocomplete="new-password"
+                        data-lpignore="true"
+                        spellcheck="false"
+                    />
+                    <div class="error-message">Please enter a valid authentication key</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="user">GitHub Username</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="user" 
+                        name="user" 
+                        class="form-control" 
+                        placeholder="Enter your GitHub username" 
+                        required 
+                        pattern="[a-zA-Z0-9_\-]+"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <div class="error-message">Please enter a valid GitHub username</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="repo">Repository Name</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="repo" 
+                        name="repo" 
+                        class="form-control" 
+                        placeholder="Enter repository name" 
+                        required 
+                        pattern="[a-zA-Z0-9_.\-]+"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <div class="error-message">Please enter a valid repository name</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="message">Commit Message</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="message" 
+                        name="message" 
+                        class="form-control" 
+                        placeholder="Describe your changes (e.g., 'Add new feature')" 
+                        required
+                        autocomplete="off"
+                    />
+                    <div class="error-message">Please enter a commit message</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="fileContent">File Content</label>
+                <div class="input-wrapper">
+                    <textarea 
+                        id="fileContent" 
+                        name="fileContent" 
+                        class="form-control" 
+                        placeholder="Paste your code here..." 
+                        required
+                        autocomplete="off"
+                        spellcheck="false"
+                    ></textarea>
+                    <div class="error-message">Please enter the file content</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="fileName">File Name</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="fileName" 
+                        name="fileName" 
+                        class="form-control" 
+                        placeholder="e.g., index.js, README.md, style.css" 
+                        required
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <div class="error-message">Please enter a valid file name</div>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">
+                <div class="btn-content">
+                    <span class="btn-text">Push to GitHub</span>
+                    <div class="loading-spinner"></div>
+                </div>
+            </button>
+        </form>
+    </div>
+    <!-- Custom Alert Modal -->
+    <div id="alertOverlay" class="alert-overlay">
+        <div class="alert-modal">
+            <div id="alertIcon" class="alert-icon"></div>
+            <h3 id="alertTitle" class="alert-title"></h3>
+            <p id="alertMessage" class="alert-message"></p>
+            <button id="alertButton" class="alert-button">OK</button>
+        </div>
+    </div>
+    <script>
+        // Alert Modal
+        function showAlert(type, title, message) {
+            const overlay = document.getElementById('alertOverlay');
+            const icon = document.getElementById('alertIcon');
+            const titleEl = document.getElementById('alertTitle');
+            const messageEl = document.getElementById('alertMessage');
+            const button = document.getElementById('alertButton');
+            const icons = {
+                success: `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+                error: `<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
+                warning: `<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
+            };
+            icon.className = `alert-icon ${type}`;
+            titleEl.className = `alert-title ${type}`;
+            messageEl.className = `alert-message ${type}`;
+            icon.innerHTML = icons[type] || icons.warning;
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            overlay.classList.remove('hide');
+            overlay.classList.add('show');
+            button.onclick = () => {
+                overlay.classList.add('hide');
+                setTimeout(() => {
+                    overlay.classList.remove('show', 'hide');
+                }, 300);
+            };
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (overlay.classList.contains('show')) {
+                        overlay.classList.add('hide');
+                        setTimeout(() => {
+                            overlay.classList.remove('show', 'hide');
+                        }, 300);
+                    }
+                }, 4000);
+            }
+            const handleKeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    button.click();
+                }
+            };
+            button.addEventListener('keydown', handleKeydown);
+            button.focus();
+        }
+
+        // Form validation
+        function validateField(field) {
+            const value = field.value.trim();
+            const isValid = field.checkValidity() && value.length > 0;
+            field.classList.toggle('error', !isValid);
+            field.classList.toggle('success', isValid);
+            return isValid;
+        }
+
+        // Add real-time validation
+        document.querySelectorAll('.form-control').forEach(field => {
+            field.addEventListener('blur', () => validateField(field));
+            field.addEventListener('input', () => {
+                if (field.classList.contains('error')) {
+                    validateField(field);
+                }
+            });
+        });
+
+        document.getElementById('pushForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('.submit-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const loading = submitBtn.querySelector('.loading-spinner');
+            const fields = form.querySelectorAll('.form-control');
+            let isFormValid = true;
+            fields.forEach(field => {
+                if (!validateField(field)) {
+                    isFormValid = false;
+                }
+            });
+            if (!isFormValid) {
+                showAlert('error', 'Validation Error', 'Please fill in all fields correctly before submitting.');
+                return;
+            }
+            submitBtn.disabled = true;
+            form.classList.add('form-loading');
+            btnText.textContent = 'Pushing...';
+            loading.style.display = 'block';
+            try {
+                const rawAuthKey = form.authKey.value;
+                const authKeyValue = rawAuthKey
+                    .replace(/[\r\n\t\u00A0\u200B\u200C\u200D\uFEFF]/g, '')
+                    .trim();
+                const requestBody = {
+                    user: form.user.value.trim(),
+                    repo: form.repo.value.trim(),
+                    message: form.message.value.trim(),
+                    authKey: authKeyValue,
+                    files: [
+                        {
+                            name: form.fileName.value.trim(),
+                            content: form.fileContent.value
+                        }
+                    ]
+                };
+                const res = await fetch('https://aiagent.lapakinhil.com/webhook/push-from-ui', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                let result;
+                const contentType = res.headers.get('content-type');
+                const contentLength = res.headers.get('content-length');
+                if (contentLength === '0' || contentLength === 0) {
+                    result = {
+                        success: true,
+                        error: false,
+                        message: 'Push completed successfully! (Empty response from server indicates success)'
+                    };
+                } else if (contentType && contentType.includes('application/json')) {
+                    try {
+                        const responseText = await res.text();
+                        if (responseText.trim() === '') {
+                            result = {
+                                success: true,
+                                error: false,
+                                message: 'Push completed successfully! (Empty JSON response)'
+                            };
+                        } else {
+                            result = JSON.parse(responseText);
+                        }
+                    } catch (parseError) {
+                        result = {
+                            success: false,
+                            error: true,
+                            message: 'Server returned invalid JSON response. The workflow may have started but response was malformed.',
+                            code: 'PARSE_ERROR'
+                        };
+                    }
+                } else {
+                    const textResult = await res.text();
+                    if (textResult.toLowerCase().includes('invalid authentication') || 
+                        textResult.toLowerCase().includes('unauthorized')) {
+                        result = {
+                            success: false,
+                            error: true,
+                            code: 'AUTH_ERROR',
+                            message: 'Authentication failed - invalid key'
+                        };
+                    } else if (textResult.includes('Workflow was started')) {
+                        result = {
+                            success: true,
+                            error: false,
+                            message: 'Workflow started successfully: ' + textResult
+                        };
+                    } else if (textResult.trim() === '') {
+                        result = {
+                            success: true,
+                            error: false,
+                            message: 'Push completed successfully! (Empty response from server)'
+                        };
+                    } else {
+                        result = {
+                            success: false,
+                            error: true,
+                            message: 'Server returned unexpected response: ' + textResult
+                        };
+                    }
+                }
+                if (result.success === true && result.error !== true) {
+                    showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
+                    form.reset();
+                    fields.forEach(field => {
+                        field.classList.remove('success', 'error');
+                    });
+                } else {
+                    const errorMessage = result.message || 'Unknown error occurred';
+                    const errorCode = result.code || '';
+                    if (errorMessage.includes('Authentication key is required')) {
+                        showAlert('error', '🔐 Server Auth Key Issue', 
+                            `Server reports "Authentication key is required" but we sent "${authKeyValue}". This suggests a server-side parsing issue. Check server logs for JSON parsing errors.`);
+                    } else if (errorCode === 'AUTH_ERROR' || 
+                               errorMessage.toLowerCase().includes('invalid authentication')) {
+                        if (authKeyValue === 'push16') {
+                            showAlert('warning', '🔐 Authentication Issue', 
+                                'Auth key is correct but server validation failed. Check server-side validation logic.');
+                        } else {
+                            showAlert('error', '🔐 Invalid Authentication Key', 
+                                'The authentication key you entered is incorrect. Please check and try again.');
+                        }
+                        form.authKey.focus();
+                        form.authKey.select();
+                    } else if (errorCode === 'VALIDATION_ERROR' || 
+                               errorMessage.toLowerCase().includes('missing required fields')) {
+                        showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
+                    } else {
+                        showAlert('error', 'Push Failed', errorMessage);
+                    }
+                }
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showAlert('error', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
+                } else if (error.name === 'SyntaxError') {
+                    showAlert('warning', '⚠️ Response Format Error', 'Server returned invalid response format. The request may have been processed incorrectly.');
+                } else {
+                    showAlert('error', 'Unexpected Error', 'An unexpected error occurred: ' + error.message);
+                }
+            } finally {
+                submitBtn.disabled = false;
+                form.classList.remove('form-loading');
+                btnText.textContent = 'Push to GitHub';
+                loading.style.display = 'none';
+            }
+        });
+
+        document.getElementById('alertOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'alertOverlay') {
+                e.target.classList.add('hide');
+                setTimeout(() => {
+                    e.target.classList.remove('show', 'hide');
+                }, 300);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('alertOverlay');
+            if (e.key === 'Escape' && overlay.classList.contains('show')) {
+                overlay.classList.add('hide');
+                setTimeout(() => {
+                    overlay.classList.remove('show', 'hide');
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
