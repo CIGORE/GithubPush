@@ -553,41 +553,41 @@
         </div>
 
         <form id="pushForm">
-            <div class="form-group">
-                <label for="user">GitHub Username</label>
-                <input type="text" id="user" name="user" class="form-control" placeholder="Your GitHub username" required autocomplete="off" />
-            </div>
-            <div class="form-group">
-                <label for="repo">Repository Name</label>
-                <input type="text" id="repo" name="repo" class="form-control" placeholder="Repository name" required autocomplete="off" />
-            </div>
-            <div class="form-group">
-                <label for="fileName">File Name</label>
-                <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html, README.md, dll" required autocomplete="off" />
-            </div>
-            <div class="form-group">
-                <label for="findLine">Cari Baris (Case Sensitive!)</label>
-                <input type="text" id="findLine" name="findLine" class="form-control" placeholder="Misal: <title>Test Web</title>" required autocomplete="off" />
-            </div>
-            <div class="form-group">
-                <label for="replaceLine">Ganti Dengan</label>
-                <input type="text" id="replaceLine" name="replaceLine" class="form-control" placeholder="Misal: <title>Judul Baru</title>" required autocomplete="off" />
-            </div>
-            <div class="form-group">
-                <label for="message">Commit Message</label>
-                <input type="text" id="message" name="message" class="form-control" placeholder="Deskripsi perubahan" required autocomplete="off" />
-            </div>
-            <div class="form-group">
-                <label for="token">GitHub Token (Personal Access Token, repo scope)</label>
-                <input type="password" id="token" name="token" class="form-control" placeholder="Github PAT" required autocomplete="off" />
-            </div>
-            <button type="submit" class="submit-btn">
-                <div class="btn-content">
-                    <span class="btn-text">Replace & Commit</span>
-                    <div class="loading-spinner"></div>
-                </div>
-            </button>
-        </form>
+    <div class="form-group">
+        <label for="user">GitHub Username</label>
+        <input type="text" id="user" name="user" class="form-control" placeholder="Your GitHub username" required autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label for="repo">Repository Name</label>
+        <input type="text" id="repo" name="repo" class="form-control" placeholder="Repository name" required autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label for="fileName">File Name</label>
+        <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html, README.md, dll" required autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label for="findLine">Cari Baris / Blok (bisa multi-baris, Case Sensitive!)</label>
+        <textarea id="findLine" name="findLine" class="form-control" placeholder="Paste baris/blok kode yang mau diganti" required autocomplete="off"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="replaceLine">Ganti Dengan (bisa multi-baris)</label>
+        <textarea id="replaceLine" name="replaceLine" class="form-control" placeholder="Isi pengganti, bisa multi-baris" required autocomplete="off"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="message">Commit Message</label>
+        <input type="text" id="message" name="message" class="form-control" placeholder="Deskripsi perubahan" required autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label for="token">GitHub Token (Personal Access Token, repo scope)</label>
+        <input type="password" id="token" name="token" class="form-control" placeholder="Github PAT" required autocomplete="off" />
+    </div>
+    <button type="submit" class="submit-btn">
+        <div class="btn-content">
+            <span class="btn-text">Replace & Commit</span>
+            <div class="loading-spinner"></div>
+        </div>
+    </button>
+</form>
     </div>
     <!-- Custom Alert Modal -->
     <div id="alertOverlay" class="alert-overlay">
