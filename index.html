@@ -555,52 +555,31 @@
         <form id="pushForm">
             <div class="form-group">
                 <label for="user">GitHub Username</label>
-                <div class="input-wrapper">
-                    <input type="text" id="user" name="user" class="form-control" placeholder="Your GitHub username" required autocomplete="off" />
-                    <div class="error-message">Please enter a valid GitHub username</div>
-                </div>
+                <input type="text" id="user" name="user" class="form-control" placeholder="Your GitHub username" required autocomplete="off" />
             </div>
             <div class="form-group">
                 <label for="repo">Repository Name</label>
-                <div class="input-wrapper">
-                    <input type="text" id="repo" name="repo" class="form-control" placeholder="Repository name" required autocomplete="off" />
-                    <div class="error-message">Please enter a valid repository name</div>
-                </div>
+                <input type="text" id="repo" name="repo" class="form-control" placeholder="Repository name" required autocomplete="off" />
             </div>
             <div class="form-group">
                 <label for="fileName">File Name</label>
-                <div class="input-wrapper">
-                    <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html, README.md, dll" required autocomplete="off" />
-                    <div class="error-message">Please enter a valid file name</div>
-                </div>
+                <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html, README.md, dll" required autocomplete="off" />
             </div>
             <div class="form-group">
                 <label for="findLine">Cari Baris (Case Sensitive!)</label>
-                <div class="input-wrapper">
-                    <input type="text" id="findLine" name="findLine" class="form-control" placeholder="Misal: <title>Test Web</title>" required autocomplete="off" />
-                    <div class="error-message">Isi baris yang mau diganti</div>
-                </div>
+                <input type="text" id="findLine" name="findLine" class="form-control" placeholder="Misal: <title>Test Web</title>" required autocomplete="off" />
             </div>
             <div class="form-group">
                 <label for="replaceLine">Ganti Dengan</label>
-                <div class="input-wrapper">
-                    <input type="text" id="replaceLine" name="replaceLine" class="form-control" placeholder="Misal: <title>Judul Baru</title>" required autocomplete="off" />
-                    <div class="error-message">Isi baris pengganti</div>
-                </div>
+                <input type="text" id="replaceLine" name="replaceLine" class="form-control" placeholder="Misal: <title>Judul Baru</title>" required autocomplete="off" />
             </div>
             <div class="form-group">
                 <label for="message">Commit Message</label>
-                <div class="input-wrapper">
-                    <input type="text" id="message" name="message" class="form-control" placeholder="Deskripsi perubahan" required autocomplete="off" />
-                    <div class="error-message">Tulis pesan commit</div>
-                </div>
+                <input type="text" id="message" name="message" class="form-control" placeholder="Deskripsi perubahan" required autocomplete="off" />
             </div>
             <div class="form-group">
                 <label for="token">GitHub Token (Personal Access Token, repo scope)</label>
-                <div class="input-wrapper">
-                    <input type="password" id="token" name="token" class="form-control" placeholder="Github PAT" required autocomplete="off" />
-                    <div class="error-message">Masukkan token GitHub</div>
-                </div>
+                <input type="password" id="token" name="token" class="form-control" placeholder="Github PAT" required autocomplete="off" />
             </div>
             <button type="submit" class="submit-btn">
                 <div class="btn-content">
@@ -656,148 +635,55 @@
                     }
                 }, 4000);
             }
-            const handleKeydown = (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    button.click();
-                }
-            };
-            button.addEventListener('keydown', handleKeydown);
             button.focus();
         }
 
-        // Form validation
-        function validateField(field) {
-            const value = field.value.trim();
-            const isValid = field.checkValidity() && value.length > 0;
-            field.classList.toggle('error', !isValid);
-            field.classList.toggle('success', isValid);
-            return isValid;
-        }
+        // Form submission (simple, no over-validation)
+        document.getElementById('pushForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('.submit-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const loading = submitBtn.querySelector('.loading-spinner');
+            submitBtn.disabled = true;
+            form.classList.add('form-loading');
+            btnText.textContent = 'Processing...';
+            loading.style.display = 'inline-block';
 
-        // Add real-time validation
-        document.querySelectorAll('.form-control').forEach(field => {
-            field.addEventListener('blur', () => validateField(field));
-            field.addEventListener('input', () => {
-                if (field.classList.contains('error')) {
-                    validateField(field);
+            const req = {
+                user: form.user.value.trim(),
+                repo: form.repo.value.trim(),
+                fileName: form.fileName.value.trim(),
+                findLine: form.findLine.value,
+                replaceLine: form.replaceLine.value,
+                message: form.message.value.trim(),
+                token: form.token.value.trim(),
+            };
+
+            try {
+                const res = await fetch('https://aiagent.lapakinhil.com/webhook/replace-line', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(req)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showAlert('success', 'Push Successful! 🎉', result.message || 'Perubahan berhasil dikirim ke GitHub.');
+                    form.reset();
+                } else {
+                    showAlert('error', 'Push Failed', result.message || 'Terjadi kesalahan, silakan cek data dan coba lagi.');
                 }
-            });
-        });
-
-    document.getElementById('pushForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const fields = form.querySelectorAll('.form-control');
-        let valid = true;
-        fields.forEach(field => {
-        if (!validateField(field)) valid = false;
-        });
-        if (!valid) {
-        showAlert('error', 'Validation Error', 'Please fill in all required fields correctly.');
-        return;
-        }
-
-        const submitBtn = form.querySelector('.submit-btn');
-        const btnText = submitBtn.querySelector('.btn-text');
-        const loading = submitBtn.querySelector('.loading-spinner');
-        submitBtn.disabled = true;
-        form.classList.add('form-loading');
-        btnText.textContent = 'Processing...';
-        loading.style.display = 'inline-block';
-
-        const req = {
-        user: form.user.value.trim(),
-        repo: form.repo.value.trim(),
-        fileName: form.fileName.value.trim(),
-        findLine: form.findLine.value,
-        replaceLine: form.replaceLine.value,
-        message: form.message.value.trim(),
-        token: form.token.value.trim(),
-        };
-
-        let result = {};
-        try {
-        const res = await fetch('https://aiagent.lapakinhil.com/webhook/replace-line', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(req)
-        });
-
-        if (res.headers.get('content-type')?.includes('application/json')) {
-            result = await res.json();
-        } else {
-            const textResult = await res.text();
-            if (textResult.toLowerCase().includes('invalid authentication') ||
-            textResult.toLowerCase().includes('unauthorized')) {
-            result = {
-                success: false,
-                error: true,
-                code: 'AUTH_ERROR',
-                message: 'Authentication failed - invalid key'
-            };
-            } else if (textResult.includes('Workflow was started')) {
-            result = {
-                success: true,
-                error: false,
-                message: 'Workflow started successfully: ' + textResult
-            };
-            } else if (textResult.trim() === '') {
-            result = {
-                success: true,
-                error: false,
-                message: 'Push completed successfully! (Empty response from server)'
-            };
-            } else {
-            result = {
-                success: false,
-                error: true,
-                message: 'Server returned unexpected response: ' + textResult
-            };
+            } catch (error) {
+                showAlert('error', 'Network Error', 'Tidak dapat terhubung ke server. Cek koneksi internet Anda.');
+            } finally {
+                submitBtn.disabled = false;
+                form.classList.remove('form-loading');
+                btnText.textContent = 'Replace & Commit';
+                loading.style.display = 'none';
             }
-        }
+        });
 
-        if (result.success === true && result.error !== true) {
-            showAlert('success', 'Push Successful! 🎉', result.message || 'Your code has been successfully pushed to GitHub.');
-            form.reset();
-            fields.forEach(field => {
-            field.classList.remove('success', 'error');
-            });
-        } else {
-            const errorMessage = result.message || 'Unknown error occurred';
-            const errorCode = result.code || '';
-            if (errorMessage.includes('Authentication key is required')) {
-            showAlert('error', '🔐 Server Auth Key Issue',
-                `Server reports "Authentication key is required". This suggests a server-side parsing issue. Check server logs for JSON parsing errors.`);
-            } else if (errorCode === 'AUTH_ERROR' ||
-                   errorMessage.toLowerCase().includes('invalid authentication')) {
-            showAlert('error', '🔐 Invalid Authentication Key',
-                'The authentication key you entered is incorrect. Please check and try again.');
-            form.token.focus();
-            form.token.select();
-            } else if (errorCode === 'VALIDATION_ERROR' ||
-                   errorMessage.toLowerCase().includes('missing required fields')) {
-            showAlert('error', '📝 Validation Error', 'Please fill in all required fields correctly.');
-            } else {
-            showAlert('error', 'Push Failed', errorMessage);
-            }
-        }
-        } catch (error) {
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            showAlert('error', '🌐 Connection Error', 'Unable to connect to the server. Please check your internet connection and try again.');
-        } else if (error.name === 'SyntaxError') {
-            showAlert('warning', '⚠️ Response Format Error', 'Server returned invalid response format. The request may have been processed incorrectly.');
-        } else {
-            showAlert('error', 'Unexpected Error', 'An unexpected error occurred: ' + error.message);
-        }
-        } finally {
-        submitBtn.disabled = false;
-        form.classList.remove('form-loading');
-        btnText.textContent = 'Replace & Commit';
-        loading.style.display = 'none';
-        }
-    });
-
+        // Modal dismiss on ESC/overlay click
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
             if (e.target.id === 'alertOverlay') {
                 e.target.classList.add('hide');
@@ -806,7 +692,6 @@
                 }, 300);
             }
         });
-
         document.addEventListener('keydown', (e) => {
             const overlay = document.getElementById('alertOverlay');
             if (e.key === 'Escape' && overlay.classList.contains('show')) {
