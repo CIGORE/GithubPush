@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GithubPushWeb</title>
+<title>GithubPushWebbbbb</title>
     <style>
         * {
             margin: 0;
@@ -554,36 +554,36 @@
 
         <form id="pushForm">
     <div class="form-group">
-        <label for="user">GitHub Username</label>
+        <label for="user">GitHub Usernameasd</label>
         <input type="text" id="user" name="user" class="form-control" placeholder="Your GitHub username" required autocomplete="off" />
     </div>
     <div class="form-group">
-        <label for="repo">Repository Name</label>
+        <label for="repo">Repository Nameasd</label>
         <input type="text" id="repo" name="repo" class="form-control" placeholder="Repository name" required autocomplete="off" />
     </div>
     <div class="form-group">
-        <label for="fileName">File Name</label>
+        <label for="fileName">File Nameasd</label>
         <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html, README.md, dll" required autocomplete="off" />
     </div>
     <div class="form-group">
-        <label for="findLine">Cari Baris / Blok (bisa multi-baris, Case Sensitive!)</label>
+        <label for="findLine">Cari Baris / Blok (bisa multi-baris, Case Sensitive!)asd</label>
         <textarea id="findLine" name="findLine" class="form-control" placeholder="Paste baris/blok kode yang mau diganti" required autocomplete="off"></textarea>
     </div>
     <div class="form-group">
-        <label for="replaceLine">Ganti Dengan (bisa multi-baris)</label>
+        <label for="replaceLine">Ganti Dengan (bisa multi-baris)asd</label>
         <textarea id="replaceLine" name="replaceLine" class="form-control" placeholder="Isi pengganti, bisa multi-baris" required autocomplete="off"></textarea>
     </div>
     <div class="form-group">
-        <label for="message">Commit Message</label>
+        <label for="message">Commit Messageasd</label>
         <input type="text" id="message" name="message" class="form-control" placeholder="Deskripsi perubahan" required autocomplete="off" />
     </div>
     <div class="form-group">
-        <label for="token">GitHub Token (Personal Access Token, repo scope)</label>
+        <label for="token">GitHub Token (Personal Access Token, repo scope)asd</label>
         <input type="password" id="token" name="token" class="form-control" placeholder="Github PAT" required autocomplete="off" />
     </div>
     <button type="submit" class="submit-btn">
         <div class="btn-content">
-            <span class="btn-text">Replace & Commit</span>
+            <span class="btn-text">Replace & Commitasd</span>
             <div class="loading-spinner"></div>
         </div>
     </button>
@@ -690,20 +690,20 @@
 
         if (isJson && result) {
             if (result.success) {
-                showAlert('success', 'Push Successful! 🎉', result.message || 'Perubahan berhasil dikirim ke GitHub.');
+                showAlert('success', 'Push Successfulasd! 🎉', result.message || 'Perubahan berhasil dikirim ke GitHub.');
                 form.reset();
             } else {
                 if (isLineNotFound(result.message)) {
-                    showAlert('warning', 'Baris Tidak Ditemukan', result.message);
+                    showAlert('warning', 'Baris Tidak Ditemukanasd', result.message);
                 } else {
-                    showAlert('error', 'Push Failed', result.message || 'Terjadi kesalahan, silakan cek data dan coba lagi.');
+                    showAlert('error', 'Push Failedasd', result.message || 'Terjadi kesalahan, silakan cek data dan coba lagi.');
                 }
             }
         } else {
             showAlert('error', 'Server Error', (typeof result === 'string' && result.length < 300) ? result : 'Terjadi kesalahan pada server.');
         }
     } catch (error) {
-        showAlert('error', 'Network Error', 'Tidak dapat terhubung ke server. Cek koneksi internet Anda.');
+        showAlert('error', 'Network Error', 'Tidak dapat terhubung ke server. Cek koneksi internet Andaasd.');
     } finally {
         submitBtn.disabled = false;
         form.classList.remove('form-loading');
