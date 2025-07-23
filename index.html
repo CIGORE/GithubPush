@@ -667,7 +667,6 @@
             body: JSON.stringify(req)
         });
 
-        // Try to parse response as JSON, fallback to text if error
         let result;
         let isJson = false;
         try {
@@ -682,20 +681,25 @@
             result = await res.text();
         }
 
+        // Robust check for different "line not found" variants (Indonesia/English)
+        const isLineNotFound = (msg) =>
+            msg && (
+                msg.toLowerCase().includes('line not found') ||
+                msg.toLowerCase().includes('baris tidak ditemukan')
+            );
+
         if (isJson && result) {
             if (result.success) {
                 showAlert('success', 'Push Successful! 🎉', result.message || 'Perubahan berhasil dikirim ke GitHub.');
                 form.reset();
             } else {
-                // Lebih spesifik untuk error "line tidak ditemukan"
-                if (result.message && result.message.includes('Line not found')) {
-                    showAlert('warning', 'Line Tidak Ditemukan', result.message);
+                if (isLineNotFound(result.message)) {
+                    showAlert('warning', 'Baris Tidak Ditemukan', result.message);
                 } else {
                     showAlert('error', 'Push Failed', result.message || 'Terjadi kesalahan, silakan cek data dan coba lagi.');
                 }
             }
         } else {
-            // Response dari server bukan JSON, tampilkan pesan gagal umum
             showAlert('error', 'Server Error', (typeof result === 'string' && result.length < 300) ? result : 'Terjadi kesalahan pada server.');
         }
     } catch (error) {
@@ -707,6 +711,7 @@
         loading.style.display = 'none';
     }
 });
+
         // Modal dismiss on ESC/overlay click
         document.getElementById('alertOverlay').addEventListener('click', (e) => {
             if (e.target.id === 'alertOverlay') {
