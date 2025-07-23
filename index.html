@@ -582,9 +582,10 @@
         <input type="password" id="token" name="token" class="form-control" placeholder="Github PAT" required autocomplete="off" />
     </div>
 <div class="form-group">
-    <label for="branch">Branch (opsional, kosongkan untuk default branch)</label>
-    <input type="text" id="branch" name="branch" class="form-control" placeholder="main, master, dll" autocomplete="off" />
+  <label for="branch">Branch (optional, default = main/master)</label>
+  <input type="text" id="branch" name="branch" class="form-control" placeholder="master, main, develop, etc" autocomplete="off" />
 </div>
+            
     <button type="submit" class="submit-btn">
         <div class="btn-content">
             <span class="btn-text">Replace & Commit</span>
@@ -643,7 +644,7 @@
         }
 
         // Form submission (simple, no over-validation)
-        document.getElementById('pushForm').addEventListener('submit', async (e) => {
+document.getElementById('pushForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
     const submitBtn = form.querySelector('.submit-btn');
@@ -662,7 +663,7 @@
         replaceLine: form.replaceLine.value,
         message: form.message.value.trim(),
         token: form.token.value.trim(),
-        branch: form.branch.value.trim(),
+        branch: form.branch.value.trim() || undefined // <-- new
     };
 
     try {
