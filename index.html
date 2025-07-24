@@ -62,7 +62,7 @@
             box-shadow: var(--shadow-heavy);
             padding: 48px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1000px;
             border: 1px solid var(--glass-border);
             position: relative;
             z-index: 1;
@@ -116,11 +116,15 @@
             line-height: 1.5;
         }
 
-        .form-grid {
+        .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 24px;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
         }
 
         .form-group {
@@ -136,10 +140,6 @@
         .form-group:nth-child(6) { animation-delay: 0.6s; }
         .form-group:nth-child(7) { animation-delay: 0.7s; }
         .form-group:nth-child(8) { animation-delay: 0.8s; }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
 
         .form-group label {
             display: block;
@@ -205,6 +205,36 @@
 
         .textarea-large {
             min-height: 140px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .help-text.warning {
+            color: #d69e2e;
+            font-weight: 500;
+        }
+
+        .help-link {
+            color: var(--focus-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .help-link:hover {
+            color: #5a67d8;
+            text-decoration: underline;
+        }
+
+        .help-link::after {
+            content: ' ↗';
+            font-size: 10px;
+            opacity: 0.7;
         }
 
         .submit-section {
@@ -289,19 +319,6 @@
             width: 28px;
             height: 28px;
             fill: currentColor;
-        }
-
-        /* Help Text */
-        .help-text {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            line-height: 1.4;
-        }
-
-        .help-text.warning {
-            color: #d69e2e;
-            font-weight: 500;
         }
 
         /* Custom Alert System */
@@ -580,7 +597,7 @@
                 font-size: 28px;
             }
 
-            .form-grid {
+            .form-row {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
@@ -626,9 +643,9 @@
         </div>
 
         <form id="pushForm">
-            <div class="form-grid">
+            <div class="form-row">
                 <div class="form-group">
-                    <label for="user" class="label-required">Nama Pengguna GitHub</label>
+                    <label for="user" class="label-required">Username GitHub</label>
                     <input type="text" id="user" name="user" class="form-control" placeholder="username-anda" required autocomplete="username" />
                     <div class="help-text">Masukkan username GitHub Anda</div>
                 </div>
@@ -638,11 +655,13 @@
                     <input type="text" id="repo" name="repo" class="form-control" placeholder="nama-repository" required autocomplete="off" />
                     <div class="help-text">Nama repository yang akan diedit</div>
                 </div>
+            </div>
 
+            <div class="form-row">
                 <div class="form-group">
-                    <label for="fileName" class="label-required">Nama File</label>
-                    <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html" required autocomplete="off" />
-                    <div class="help-text">Contoh: index.html, README.md, style.css</div>
+                    <label for="fileName" class="label-required">File Path</label>
+                    <input type="text" id="fileName" name="fileName" class="form-control" placeholder="index.html atau controller/view/index.php" required autocomplete="off" />
+                    <div class="help-text">Path lengkap file dari root repository</div>
                 </div>
 
                 <div class="form-group">
@@ -650,19 +669,25 @@
                     <input type="text" id="branch" name="branch" class="form-control" placeholder="main" autocomplete="off" />
                     <div class="help-text">Default: main/master</div>
                 </div>
+            </div>
 
-                <div class="form-group full-width">
+            <div class="form-row single">
+                <div class="form-group">
                     <label for="findLine" class="label-required">Teks yang Akan Diganti</label>
                     <textarea id="findLine" name="findLine" class="form-control textarea-large" placeholder="Masukkan teks atau kode yang akan diganti..." required autocomplete="off"></textarea>
                     <div class="help-text warning">⚠️ Pencarian bersifat case-sensitive (peka huruf besar/kecil)</div>
                 </div>
+            </div>
 
-                <div class="form-group full-width">
+            <div class="form-row single">
+                <div class="form-group">
                     <label for="replaceLine" class="label-required">Teks Pengganti</label>
                     <textarea id="replaceLine" name="replaceLine" class="form-control textarea-large" placeholder="Masukkan teks atau kode pengganti..." required autocomplete="off"></textarea>
                     <div class="help-text">Teks ini akan menggantikan teks yang ditemukan</div>
                 </div>
+            </div>
 
+            <div class="form-row">
                 <div class="form-group">
                     <label for="message" class="label-required">Pesan Commit</label>
                     <input type="text" id="message" name="message" class="form-control" placeholder="Update: perbaikan tampilan" required autocomplete="off" />
@@ -672,7 +697,10 @@
                 <div class="form-group">
                     <label for="token" class="label-required">GitHub Token</label>
                     <input type="password" id="token" name="token" class="form-control" placeholder="ghp_xxxxxxxxxxxx" required autocomplete="current-password" />
-                    <div class="help-text">Personal Access Token dengan akses repository</div>
+                    <div class="help-text">
+                        Personal Access Token dengan akses repository. 
+                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=GitHub%20Push%20Automation" target="_blank" class="help-link">Generate Token</a>
+                    </div>
                 </div>
             </div>
             
